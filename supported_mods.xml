@@ -1,15 +1,15 @@
 <SupportedMods>
 	<Mod Title="Sarcophagus" Author="Blackandfan">
-    <HomePages>
-      <HomePage Type="GitHub" URL="https://github.com/Blackandfan/Sarcophagus" />
-      <HomePage Type="ModDB" URL="https://www.moddb.com/members/blackandfan" />
-      <HomePage Type="NexusMods" URL="https://www.nexusmods.com/halowarsdefinitiveedition/users/87019178" />
-      <HomePage Type="Twitter" URL="https://twitter.com/blackandfan?lang=en">
-    </HomePages>
+		<HomePages>
+			<HomePage Type="GitHub" URL="https://github.com/Blackandfan/Sarcophagus" />
+			<HomePage Type="ModDB" URL="https://www.moddb.com/members/blackandfan" />
+			<HomePage Type="NexusMods" URL="https://www.nexusmods.com/halowarsdefinitiveedition/users/87019178" />
+			<HomePage Type="Twitter" URL="https://twitter.com/blackandfan?lang=en">
+		</HomePages>
 		<Data ShowcaseArtURL="None" DownloadURL="https://github.com/Blackandfan/Sarcophagus" Branch="master">
-      A small Halo Wars Overhaul.
-      
-      Discord: discord.gg/wwt5xux
+			A small Halo Wars Overhaul.
+			
+			Discord: discord.gg/wwt5xux
 		</Data>
 	</Mod>
 </SupportedMods>

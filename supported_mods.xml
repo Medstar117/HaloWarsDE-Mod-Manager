@@ -1,5 +1,5 @@
 <SupportedMods>
-	<Mod Title="Sarcophagus" Author="Blackandfan" MD5="C815D81044C85D422A96354968E799C0">
+	<Mod Title="Sarcophagus" Author="Blackandfan">
 		<HomePages>
 			<HomePage Type="GitHub" URL="https://github.com/Blackandfan/Sarcophagus" />
 			<HomePage Type="ModDB" URL="https://www.moddb.com/members/blackandfan" />
@@ -10,7 +10,7 @@
 			A small Halo Wars Overhaul.\n\nDiscord: discord.gg/wwt5xux
 		</Data>
 	</Mod>
-	<Mod Title="Test Mod" Author="Medstar" MD5="">
+	<Mod Title="Test Mod" Author="Medstar">
 		<HomePages>
 			<HomePage Type="GitHub" URL="https://github.com/Medstar117/TestMod" />
 			<HomePage Type="ModDB" URL="https://www.moddb.com/members/medstar" />

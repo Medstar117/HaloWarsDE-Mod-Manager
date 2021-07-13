@@ -1,0 +1,87 @@
+﻿<Window x:Class="ModManifestMaker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Mod Manifest Designer" Height="710" Width="450" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <GroupBox Header="Required" Margin="10,10,10,0"
+                  VerticalAlignment="Top" Height="190" FontSize="16" Foreground="Red">
+            <Grid>
+                <!-- Mod Name -->
+                <Label Content="Mod Name:" Margin="10,10,0,0" Padding="0,5"
+                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                       Width="110" Height="30" FontSize="14"/>
+                <TextBox x:Name="ModName_TextBox" Margin="0,10,10,0" TextWrapping="NoWrap"
+                       VerticalAlignment="Top" HorizontalAlignment="Right"
+                       Width="260" Height="30" FontSize="16" ToolTip="The name of your mod"
+                       TextChanged="RequiredData_TextChanged"/>
+
+                <!-- Mod Author -->
+                <Label Content="Mod Author:" Margin="10,50,0,0" Padding="0,5"
+                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                       Width="110" Height="30" FontSize="14"/>
+                <TextBox x:Name="ModAuthor_TextBox" Margin="0,50,10,0" TextWrapping="NoWrap"
+                         VerticalAlignment="Top" HorizontalAlignment="Right"
+                         Width="260" Height="30" FontSize="16" ToolTip="The name of whoever made this mod"
+                         TextChanged="RequiredData_TextChanged"/>
+
+                <!-- Mod Base Directory -->
+                <Label Content="Mod Folder:" Margin="10,90,0,0" Padding="0,5"
+                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                       Width="110" Height="30" FontSize="14"/>
+                <TextBox x:Name="ModFolder_TextBox" Margin="0,90,10,0" TextWrapping="NoWrap"
+                         VerticalAlignment="Top" HorizontalAlignment="Right"
+                         Width="260" Height="30" FontSize="16" ToolTip="The directory containing your 'ModData' folder. This is where your .hwmod file will be put."
+                         TextChanged="RequiredData_TextChanged"/>
+                <Button Name="ModFolder_Button" Content="Browse for Mod Folder" Margin="10,0,10,6"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                        Width="390" Height="25" Click="FileBrowser_Click" ToolTip="This folder should contain a 'ModData' folder within it that holds your mod's files!"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Optional" Margin="10,210,10,0"
+                  VerticalAlignment="Top" Height="404" FontSize="16" Foreground="Red">
+            <Grid>
+                <!-- Custom Banner Art -->
+                <Label Content="Custom Banner:" Margin="10,10" Padding="0,5"
+                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                       Width="110" Height="30" FontSize="14"/>
+                <TextBox x:Name="Banner_TextBox" Margin="0,10,10,0" TextWrapping="NoWrap" IsEnabled="False"
+                         VerticalAlignment="Top" HorizontalAlignment="Right"
+                         Width="260" Height="30" FontSize="16" ToolTip="The custom bitmap art that is displayed in the manager when the mod is selected." />
+                <Button Name="Banner_Button" Content="Browse for Custom Banner Art" Margin="10,50,10,0" IsEnabled="False"
+                        VerticalAlignment="Top" HorizontalAlignment="Center"
+                        Width="390" Height="25" Click="FileBrowser_Click"/>
+
+                <!-- Custom Icon -->
+                <Label Content="Custom Icon:" Margin="10,90,0,0" Padding="0,5"
+                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                       Width="110" Height="30" FontSize="14"/>
+                <TextBox x:Name="Icon_TextBox" Margin="0,90,10,0" TextWrapping="NoWrap"
+                         VerticalAlignment="Top" HorizontalAlignment="Right" IsEnabled="False"
+                         Width="260" Height="30" FontSize="16" ToolTip="A custom icon used when making a shortcut to this mod via the mod manager." />
+                <Button Name="Icon_Button" Content="Browse for Custom Icon" Margin="10,130,10,0" IsEnabled="False"
+                        VerticalAlignment="Top" HorizontalAlignment="Center"
+                        Width="390" Height="25" Click="FileBrowser_Click"/>
+
+                <!-- Description -->
+                <Label Content="Description:" Margin="10,170,0,0" Padding="0,5"
+                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                       Width="110" Height="30" FontSize="14"/>
+                <TextBox x:Name="Desc_TextBox" Margin="10,205,0,0" TextWrapping="Wrap" AcceptsReturn="True"
+                         VerticalAlignment="Top" HorizontalAlignment="Left"
+                         Width="391" Height="161" FontSize="14" />
+            </Grid>
+        </GroupBox>
+
+        <Button Content="Open Manifest" FontSize="16" Margin="10,10"
+                VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                Width="150" Height="40" Click="OpenManifest_Click"/>
+        <Button x:Name="SaveButton" Content="Save Manifest" FontSize="16" Margin="10,10"
+                VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                Width="150" Height="40" IsEnabled="False" Click="SaveButton_Click"/>
+
+    </Grid>
+</Window>

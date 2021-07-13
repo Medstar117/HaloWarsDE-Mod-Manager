@@ -1,0 +1,193 @@
+﻿<Window x:Class="HaloWarsDE_Mod_Manager.OptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:wpfx="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Mod Manager Options" Height="450" Width="800"
+        WindowStyle="ToolWindow" Closing="Window_Closing"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid>
+        <!-- Main GUI Layout and Background -->
+        <MediaElement x:Name="BackgroundAnimation" Stretch="UniformToFill">
+            <MediaElement.Triggers>
+                <EventTrigger RoutedEvent="MediaElement.Loaded">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <MediaTimeline Source="Assets/Videos/background_options.wmv"
+                                               Storyboard.TargetName="BackgroundAnimation"
+                                               RepeatBehavior="Forever" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </MediaElement.Triggers>
+        </MediaElement>
+
+        <!-- Left Side Buttons -->
+        <DockPanel HorizontalAlignment="Left" Height="402" LastChildFill="False" VerticalAlignment="Top" Width="160" Margin="10,10,0,0">
+            <Button Height="46" DockPanel.Dock="Top" Margin="10,10,10,0"
+                    Content="Settings" FontSize="20" Background="Transparent"
+                    Foreground="White" Click="Change_Tab"/>
+            <Button Height="46" DockPanel.Dock="Top" Margin="10,10,10,0"
+                    Content="About" FontSize="20" Background="Transparent"
+                    Foreground="White" Click="Change_Tab"/>
+            <!-- Test Buttons -->
+            <Button Height="46" DockPanel.Dock="Top" Margin="10,10,10,0"
+                    Content="Downloader" FontSize="20" Background="Transparent"
+                    Foreground="White" Click="Change_Tab" Visibility="Hidden"/>
+            <Button Height="46" DockPanel.Dock="Top" Margin="10,10,10,0"
+                    Content="Downloader2" FontSize="20" Background="Transparent"
+                    Foreground="White" Click="Change_Tab" Visibility="Hidden"/>
+        </DockPanel>
+
+        <!-- Tab/Page Control-->
+        <TabControl x:Name="TabDisplay" Margin="174,10,10,10" Background="Transparent">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="{x:Type TabItem}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
+            <TabItem Header="Settings">
+                <Grid>
+                    <!-- Distribution Data -->
+                    <Label Content="Distribution:" FontSize="14" Foreground="White"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="80" Height="25" Margin="20,15,0,0" Padding="0,0,5,5"/>
+                    <ComboBox x:Name="DistroComboBox" SelectedValuePath="Content"
+                           VerticalAlignment="Top" HorizontalAlignment="Right"
+                           Width="110" Height="25" Margin="0,15,20,0"
+                           SelectionChanged="DistroComboBox_SelectionChanged">
+                        <ComboBoxItem FontSize="14" Content="Steam"/>
+                        <ComboBoxItem FontSize="14" Content="Microsoft Store"/>
+                    </ComboBox>
+
+                    <!-- User Mods Folder Data -->
+                    <Label Content="User Mods Directory:" FontSize="14" Foreground="White"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="140" Height="30" Margin="20,45,0,0" Padding="0,0,5,5"/>
+                    <Button Content="Change Directory" FontSize="13"
+                            VerticalAlignment="Top" HorizontalAlignment="Right"
+                            Width="110" Height="25" Margin="0,47,20,0"
+                            Click="Prompt_ModFolderBrowser"/>
+                    <TextBox x:Name="FilePathTextBox" FontSize="14"
+                             VerticalAlignment="Top" IsReadOnly="True"
+                             Height="25" Margin="20,80,20,0"/>
+                    
+                    <!-- Timeout Data -->
+                    <Label Content="Launch Timeout Delay (in seconds):" FontSize="14" Foreground="White"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="225" Height="30" Margin="20,115,0,0" Padding="0,0,5,5"/>
+                    <wpfx:IntegerUpDown x:Name="TimeoutDelay_IntUpDwn" FontSize="13"
+                                        VerticalAlignment="Top" HorizontalAlignment="Right"
+                                        Width="110" Height="20" Margin="0,117,20,0"
+                                        Minimum="0" Maximum="100" ValueChanged="TimeoutDelay_IntUpDwn_ValueChanged"/>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="About">
+                <Grid>
+                    <Label Content="Developer: Medstar" FontSize="14" Foreground="White"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="400" Height="25" Margin="20,15,0,0" Padding="0,0,5,5"/>
+                    <Label Content="Discord: @Medstar#1550" FontSize="14" Foreground="White"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="400" Height="30" Margin="20,45,0,0" Padding="0,0,5,5"/>
+                    <Label Content="ModDB: https://www.moddb.com/members/medstar" FontSize="14" Foreground="White"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="400" Height="30" Margin="20,75,0,0" Padding="0,0,5,5"/>
+                    <TextBox TextWrapping="Wrap" FontSize="12"
+                             Background="Transparent" Foreground="White" BorderThickness="0"
+                             VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                             Width="550" Height="50" TextAlignment="Center" Margin="0,40"
+                             Text="Halo Wars: Definitive Edition © Microsoft Corporation. The 'HaloWarsDE Mod Manager' was created under Microsoft's 'Game Content Usage Rules' using assets from Halo Wars: Definitive Edition, and it is not endorsed by or affiliated with Microsoft."/>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Downloader">
+                <Grid>
+                    <!-- URL Type -->
+                    <Label Content="URL Type:" FontSize="14" Foreground="White"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="80" Height="28" Margin="20,15,0,0" Padding="0,5,0,0"/>
+                    <Label x:Name="Label_URLType" FontSize="14"
+                           VerticalAlignment="Top" HorizontalAlignment="Right"
+                           Width="110" Height="28" Margin="0,15,20,0" />
+
+                    <!-- URL Processing -->
+                    <Label x:Name="ComboBox_Label" Content="Git Branch:" FontSize="14" Foreground="Gray"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Width="140" Height="30" Margin="20,45,0,0" Padding="0,5,0,0"/>
+                    <ComboBox x:Name="ComboBox_GitBranch" SelectedValuePath="Content"
+                              VerticalAlignment="Top" HorizontalAlignment="Right"
+                              Width="110" Height="25" Margin="0,47,20,0" IsEnabled="False"
+                              Foreground="DimGray">
+                    </ComboBox>
+                    <TextBox x:Name="URLTextBox" FontSize="14"
+                             VerticalAlignment="Top"
+                             Height="25" Margin="20,82,20,0"
+                             TextChanged="URLTextBox_TextChanged"/>
+
+                    <!-- Bottom Buttons -->
+                    <Button x:Name="Button_CheckURL" Content="Check URL" FontSize="13" HorizontalAlignment="Left"
+                            Width="110" Margin="64,119,0,0"
+                            Click="Button_CheckURL_Click" Height="25" VerticalAlignment="Top"/>
+                    <Button x:Name="Button_DownloadMod" Content="Download Mod" FontSize="13" HorizontalAlignment="Right"
+                            Width="110" Margin="0,119,64,0" IsEnabled="False"
+                            Click="Button_DownloadMod_Click" Height="25" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Downloader2">
+                <Grid>
+                    <!-- URL Type -->
+                    <Label Content="Select a Mod You Would Like To Download" FontSize="20" Foreground="White"
+                           VerticalAlignment="Top" Height="28" Margin="20,15,20,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"/>
+
+                    <!-- Browser Buttons -->
+                    <!-- <Button x:Name="ModDB" Content="Check URL" FontSize="13" HorizontalAlignment="Left"
+                            Width="110" Margin="70,62,0,0"
+                            Click="Button_CheckURL_Click" Height="25" VerticalAlignment="Top"/> -->
+                    <Button x:Name="Button_DownloadMod2" Content="Download Mod" FontSize="13" HorizontalAlignment="Right"
+                            Width="110" Margin="0,0,20,30" IsEnabled="True"
+                            Click="Button_DownloadMod_Click" Height="25" VerticalAlignment="Bottom"/>
+                    <ListBox x:Name="ListBox_DownloadableModsList" Margin="10,92,0,0" Width="180"
+                             Background="Transparent" HorizontalAlignment="Left" Height="270" VerticalAlignment="Top"
+                             ItemsSource="{Binding DownloadableModList}" SelectionChanged="ListBox_DownloadableModsList_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Margin="3" Text="{Binding Title}" Foreground="White" FontSize="14"/>
+                                    <!--<Image Margin="3" Source="{Binding Path}"/>-->
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Image x:Name="ModBannerArt" Stretch="UniformToFill"  Source="pack://application:,,,/Assets/default_banner.png"
+                           VerticalAlignment="Top" HorizontalAlignment="Right"
+                           Width="385" Height="90" Margin="0,92,10,0"/>
+                    <TextBox x:Name="DescriptionTextBox" IsReadOnly="True"
+                            TextWrapping="Wrap" FontFamily="Arial" FontSize="12"
+                            VerticalAlignment="Top" HorizontalAlignment="Left"
+                            Width="385" Height="127" Margin="199,187,0,0"
+                            Foreground="White" BorderThickness="0">
+                        <TextBox.Background>
+                            <SolidColorBrush Color="DimGray" Opacity=".75"/>
+                        </TextBox.Background>
+                    </TextBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Version Data -->
+        <Label x:Name="ModManagerVerLabel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="150" Height="25" Margin="0,0,10,10">
+            <Label.ContentTemplate>
+                <DataTemplate>
+                    <Viewbox VerticalAlignment="Top" HorizontalAlignment="Center">
+                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Text="{Binding}" FontSize="26" Foreground="White"/>
+                    </Viewbox>
+                </DataTemplate>
+            </Label.ContentTemplate>
+        </Label>
+
+    </Grid>
+</Window>

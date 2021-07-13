@@ -1,0 +1,30 @@
+# Miscellaneous
+HaloWarsDE Mod Manager/.vs
+HaloWarsDE Mod Manager/_Releases
+HaloWarsDE Mod Manager/_Builds
+HaloWarsDE Mod Manager/WebScraper
+HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/bin
+HaloWarsDE Mod Manager/Extras
+
+# UWP.ProcFetcher
+HaloWarsDE Mod Manager/UWP.ProcFetcher/bin
+HaloWarsDE Mod Manager/UWP.ProcFetcher/obj
+
+# ModManifestMaker
+HaloWarsDE Mod Manager/ModManifestMaker/bin
+HaloWarsDE Mod Manager/ModManifestMaker/obj
+
+# AutoUpdater
+HaloWarsDE Mod Manager/AutoUpdater/bin
+HaloWarsDE Mod Manager/AutoUpdater/obj
+
+# Mod Manager
+HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/bin
+HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/obj
+
+# Files
+
+# File Extensions
+*.ilk
+*.pdb
+*.old

@@ -1,0 +1,257 @@
+﻿<Window x:Class="HaloWarsDE_Mod_Manager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="HaloWarsDE Mod Manager" Width="960" Height="480"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <Window.Resources>
+        <!-- Images for CustomButton Events-->
+        <ImageBrush x:Key="CustomButton_Standard" ImageSource="pack://application:,,,/Assets/Buttons/Button2.png" Stretch="Fill" />
+        <ImageBrush x:Key="CustomButton_Hover" ImageSource="pack://application:,,,/Assets/Buttons/Button_Hover.png" Stretch="Fill" />
+        <ImageBrush x:Key="CustomButton_Selected" ImageSource="pack://application:,,,/Assets/Buttons/Button_Selected.png" Stretch="Fill" />
+        <ImageBrush x:Key="CustomButton_Disabled" ImageSource="pack://application:,,,/Assets/Buttons/Button_Disabled.png" Stretch="Fill" />
+
+        <!-- Custom Style/Template Data-->
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+
+        <Style x:Key="CustomButtons" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="#AAFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource CustomButton_Hover}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource CustomButton_Selected}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource CustomButton_Disabled}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="#9A9A9A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="CustomButton_AutoTextResize">
+            <Viewbox Width="72" Height="22">
+                <TextBlock Text="{Binding}" FontSize="18" FontFamily="Arial Rounded MT Bold"/>
+            </Viewbox>
+        </DataTemplate>
+
+        <SolidColorBrush x:Key="ProgressBar.Progress" Color="#FF06B025"/>
+        <SolidColorBrush x:Key="ProgressBar.Background" Color="#FFE6E6E6"/>
+        <SolidColorBrush x:Key="ProgressBar.Border" Color="#FFBCBCBC"/>
+        <Style x:Key="RoundedEdgeProgressBar" TargetType="{x:Type ProgressBar}">
+            <Setter Property="Foreground" Value="{StaticResource ProgressBar.Progress}"/>
+            <Setter Property="Background" Value="{StaticResource ProgressBar.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ProgressBar.Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ProgressBar}">
+                        <Grid x:Name="TemplateRoot">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Determinate"/>
+                                    <VisualState x:Name="Indeterminate">
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)" Storyboard.TargetName="Animation">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0.25"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:1" Value="0.25"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:2" Value="0.25"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <PointAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransformOrigin)" Storyboard.TargetName="Animation">
+                                                <EasingPointKeyFrame KeyTime="0" Value="-0.5,0.5"/>
+                                                <EasingPointKeyFrame KeyTime="0:0:1" Value="0.5,0.5"/>
+                                                <EasingPointKeyFrame KeyTime="0:0:2" Value="1.5,0.5"/>
+                                            </PointAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="5"/>
+                            <Rectangle x:Name="PART_Track"/>
+                            <Grid x:Name="PART_Indicator" ClipToBounds="true" HorizontalAlignment="Left">
+                                <Rectangle x:Name="Indicator" Fill="{TemplateBinding Foreground}" RadiusX="5" RadiusY="5"/>
+                                <Rectangle x:Name="Animation" Fill="{TemplateBinding Foreground}" RenderTransformOrigin="0.5,0.5" RadiusX="5" RadiusY="5">
+                                    <Rectangle.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform/>
+                                            <SkewTransform/>
+                                            <RotateTransform/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </Rectangle.RenderTransform>
+                                </Rectangle>
+                            </Grid>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="LayoutTransform" TargetName="TemplateRoot">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="-90"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsIndeterminate" Value="true">
+                                <Setter Property="Visibility" TargetName="Indicator" Value="Collapsed"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <!-- Main GUI Layout and Background -->
+        <MediaElement x:Name="BackgroundAnimation">
+            <MediaElement.Triggers>
+                <EventTrigger RoutedEvent="MediaElement.Loaded">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <MediaTimeline Source="Assets/Videos/background_main.wmv"
+                                               Storyboard.TargetName="BackgroundAnimation"
+                                               RepeatBehavior="Forever"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </MediaElement.Triggers>
+            <MediaElement.OpacityMask>
+                <ImageBrush ImageSource="pack://application:,,,/Assets/Layout/opacity_mask.png" Stretch="Fill"/>
+            </MediaElement.OpacityMask>
+        </MediaElement>
+        <Image Source="pack://application:,,,/Assets/Layout/new_layout_with_image.png" Stretch="Fill"/>
+        <!-- <Image Stretch="Fill" Width="400" Height="150" Margin="478,98,82,232"/> -->
+
+        <!-- Mod Content -->
+        <ListBox x:Name="ModListBox" ItemsSource="{Binding ModList}"
+                 VerticalAlignment="Top" HorizontalAlignment="Left"
+                 Width="355" Height="192" Margin="62,149,0,0"
+                 Background="Transparent" BorderThickness="0"
+                 SelectionChanged="ModListBox_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title}" Foreground="LightGray"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBox x:Name="DescriptionTextBox" IsReadOnly="True"
+                 TextWrapping="Wrap" FontFamily="Arial" FontSize="12"
+                 VerticalAlignment="Top" HorizontalAlignment="Left"
+                 Width="402" Height="92" Margin="478,246,0,0"
+                 Foreground="LightGray" Background="Transparent" BorderThickness="0" />
+        <Image x:Name="ModBannerArt" Stretch="UniformToFill" Source="pack://application:,,,/Assets/default_banner.png"
+               VerticalAlignment="Top" HorizontalAlignment="Right"
+               Width="480" Height="90" Margin="0,138,38,0"/>
+
+        <!-- Minimize and Exit buttons -->
+        <Button x:Name="MinimizeButton" BorderThickness="0"
+                VerticalAlignment="Top" HorizontalAlignment="Left"
+                Width="25" Height="24" Margin="879,32,0,0"
+                Click="MinimizeButton_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="pack://application:,,,/Assets/Buttons/Minimize.png" Stretch="Fill"/>
+            </Button.Background>
+        </Button>
+        <Button x:Name="ExitButton" BorderThickness="0"
+                VerticalAlignment="Top" HorizontalAlignment="Left"
+                Width="25" Height="24" Margin="904,32,0,0"
+                Click="ExitButton_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="pack://application:,,,/Assets/Buttons/Exit.png" Stretch="Fill"/>
+            </Button.Background>
+        </Button>
+
+        <!-- Bottom Buttons -->
+        <DockPanel Height="44" LastChildFill="False" Margin="112,395,112,0" VerticalAlignment="Top">
+            <Button x:Name="OptionsButton" BorderThickness="0"
+                VerticalAlignment="Top" HorizontalAlignment="Left"
+                Width="112" Height="44" DockPanel.Dock="Left"
+                Content="OPTIONS" Background="{StaticResource CustomButton_Standard}"
+                Style="{StaticResource CustomButtons}" ContentTemplate="{StaticResource CustomButton_AutoTextResize}"
+                Click="OptionsButton_Click" />
+            <Button x:Name="ModFolderButton" BorderThickness="0"
+                VerticalAlignment="Top" HorizontalAlignment="Left"
+                Width="112" Height="44" DockPanel.Dock="Left" Margin="85,0,0,0"
+                Content="MY MODS" Background="{StaticResource CustomButton_Standard}"
+                Style="{StaticResource CustomButtons}" ContentTemplate="{StaticResource CustomButton_AutoTextResize}"
+                Click="ModFolderButton_Click" />
+            <Button x:Name="PlayButton" BorderThickness="0"
+                VerticalAlignment="Top" HorizontalAlignment="Right"
+                Width="112" Height="44" DockPanel.Dock="Right"  Margin="85,0,0,0"
+                Content="PLAY" Background="{StaticResource CustomButton_Standard}"
+                Style="{StaticResource CustomButtons}" ContentTemplate="{StaticResource CustomButton_AutoTextResize}"
+                Click="PlayButton_Click" />
+            <Button x:Name="CreateShortcutButton" BorderThickness="0"
+                VerticalAlignment="Top" HorizontalAlignment="Right"
+                Width="112" Height="44" DockPanel.Dock="Right"
+                Content="LINK MOD" Background="{StaticResource CustomButton_Standard}"
+                Style="{StaticResource CustomButtons}" ContentTemplate="{StaticResource CustomButton_AutoTextResize}"
+                Click="CreateShortcutButton_Click" />
+        </DockPanel>
+
+        <!-- Progress Bars -->
+        <Label x:Name="pBarLabel" x:FieldModifier="public"
+               BorderThickness="0" ClipToBounds="True"
+               VerticalAlignment="Top" HorizontalAlignment="Left"
+               Width="470" Height="21" Margin="244,439,0,0" Padding="0"
+               FontSize="12" Foreground="#AAFFFF" Visibility="Hidden"/>
+        <ProgressBar x:Name="pBar" x:FieldModifier="public" BorderThickness="0"
+                     VerticalAlignment="Top" HorizontalAlignment="Left"
+                     Width="470" Height="10" Margin="244,460,0,0"
+                     Background="DimGray" Visibility="Hidden"
+                     Style="{DynamicResource RoundedEdgeProgressBar}">
+            <ProgressBar.Foreground>
+                <LinearGradientBrush>
+                    <GradientStop Color="#AAFFFF" Offset="0.825"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </ProgressBar.Foreground>
+        </ProgressBar>
+
+    </Grid>
+</Window>

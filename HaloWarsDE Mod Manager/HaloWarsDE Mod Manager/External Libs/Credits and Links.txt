@@ -1,0 +1,7 @@
+﻿Class: JunctionPointNet.cs
+License: None
+Original Link: https://www.codeproject.com/Articles/15633/Manipulating-NTFS-Junction-Points-in-NET
+
+Class: MessageBoxManager.cs
+License: The Code Project Open License (CPOL) - http://www.codeproject.com/info/cpol10.aspx
+Original Link: https://www.codeproject.com/Articles/18399/Localizing-System-MessageBox

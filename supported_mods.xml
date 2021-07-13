@@ -1,0 +1,9 @@
+<SupportedMods>
+	<Mod Title="More Leaders Mod" Author="Blackandfan" HomePage="https://www.github.com/Blackandfan/More-Leaders-Mod">
+		<ShowcaseArtURL StretchType="UniformToFill">NONE</ShowcaseArtURL>
+		<BriefDescription>
+			Long description of mod here.
+			Could accept \n, \t, etc., or be treated as a string literal (preferably the latter for user ease).
+		</BriefDescription>
+	</Mod>
+</SupportedMods>

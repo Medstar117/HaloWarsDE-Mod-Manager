@@ -100,9 +100,9 @@ namespace HaloWarsDE_Mod_Manager
                 if (args.Length > 1)
                 {
                     for (int index = 1; index < args.Length; index++)
-                        if (args[index] == "--modname")
+                        if (args[index] == "--mod_id")
                             foreach (Mod mod in ModList)
-                                if (mod.Title == args[index + 1])
+                                if (mod.ModID == args[index + 1])
                                 {
                                     LaunchedFromShortcut = true;
                                     PlayGame(mod);
@@ -202,6 +202,7 @@ namespace HaloWarsDE_Mod_Manager
             /*******************************************
 			* Launch the game and load the selected mod.
 			*******************************************/
+            bool Start_OK = true;
 
             // Disable play button to prevent multiple launches
             if (!LaunchedFromShortcut)
@@ -236,41 +237,45 @@ namespace HaloWarsDE_Mod_Manager
                 }
                 else
                 {
-                    WriteLogEntry($"[WARNING] Selected mod \"{modObject.Title}\" is not valid! Incorrect or missing \"ModID\" element in ModManifest. Loading vanilla game instead...");
-                    _ = MessageBox.Show($"Selected mod \"{modObject.Title}\" is not valid due to an incorrect or lack of ModManifest element \"ModID\".\nVanilla gameplay will be loaded instead.", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    WriteLogEntry($"[WARNING] Selected mod \"{modObject.Title}\" is not valid! Incorrect or missing \"ModID\" element in ModManifest.");
+                    _ = MessageBox.Show($"Selected mod \"{modObject.Title}\" is not valid due to an incorrect or lack of ModManifest element \"ModID\".\nThe mod author may have forgotten to update their mod's manifest file!", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Start_OK = false;
                 }
 
-
-                // Configure process' info.
-                ProgressBarManager.SetProgressBarData(1, true, "Launching Halo Wars: Definitive Edition...");
-                ProcessStartInfo CMD_StartInfo = new ProcessStartInfo
+                if (Start_OK)
                 {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    FileName = "cmd.exe",
-                    Arguments = LaunchCommand
-                };
+                    // Configure process' info.
+                    ProgressBarManager.SetProgressBarData(1, true, "Launching Halo Wars: Definitive Edition...");
+                    ProcessStartInfo CMD_StartInfo = new ProcessStartInfo
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        FileName = "cmd.exe",
+                        Arguments = LaunchCommand
+                    };
 
-                // Create a new process to start the game.
-                Process GameCMD = new Process { StartInfo = CMD_StartInfo };
-                Stopwatch sw = new Stopwatch();
+                    // Create a new process to start the game.
+                    Process GameCMD = new Process { StartInfo = CMD_StartInfo };
+                    Stopwatch sw = new Stopwatch();
 
-                // Start the game!
-                File.SetAttributes(GameConfigFile_UMF, File.GetAttributes(GameConfigFile_UMF) & ~FileAttributes.Hidden);
-                _ = GameCMD.Start();
-                sw.Start();
-                while (!GameCMD.HasExited)
-                    if (sw.ElapsedMilliseconds > TimeoutDelay * 1000) throw new TimeoutException();
-                sw.Stop();
+                    // Start the game!
+                    File.SetAttributes(GameConfigFile_UMF, File.GetAttributes(GameConfigFile_UMF) & ~FileAttributes.Hidden);
+                    _ = GameCMD.Start();
+                    sw.Start();
+                    while (!GameCMD.HasExited)
+                        if (sw.ElapsedMilliseconds > TimeoutDelay * 1000) throw new TimeoutException();
+                    sw.Stop();
 
-                // If all goes well, fetch the game's PID
-                ProgressBarManager.SetProgressBarData(1, true, "Fetching PID for Halo Wars: Definitive Edition...");
-                Process GameProcess = Process.GetProcessById(GetGameProcessID(ref sw));
-                ProgressBarManager.SetProgressBarData(1, true, $"Caught process for Halo Wars: Definitive Edition! PID: {GameProcess.Id}");
-                
+                    // If all goes well, fetch the game's PID
+                    ProgressBarManager.SetProgressBarData(1, true, "Fetching PID for Halo Wars: Definitive Edition...");
+                    Process GameProcess = Process.GetProcessById(GetGameProcessID(ref sw));
+                    ProgressBarManager.SetProgressBarData(1, true, $"Caught process for Halo Wars: Definitive Edition! PID: {GameProcess.Id}");
+
+                    GameProcess.WaitForExit();
+                    File.SetAttributes(GameConfigFile_UMF, File.GetAttributes(GameConfigFile_UMF) | FileAttributes.Hidden);
+                }
+
                 // Clean up and reset
-                GameProcess.WaitForExit();
-                File.SetAttributes(GameConfigFile_UMF, File.GetAttributes(GameConfigFile_UMF) | FileAttributes.Hidden);
                 ProgressBarManager.ResetProgressBar();
                 if (!LaunchedFromShortcut)
                     Dispatcher.Invoke(() => { PlayButton.IsEnabled = true; });
@@ -429,7 +434,7 @@ namespace HaloWarsDE_Mod_Manager
                 IWshRuntimeLibrary.IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut)wsh.CreateShortcut(shortcutPath);
 
                 // Set shortcut properties and save it
-                shortcut.Arguments = $"--modname \"{SelectedMod.Title}\"";
+                shortcut.Arguments = $"--mod_id \"{SelectedMod.ModID}\"";
                 shortcut.TargetPath = Path.Combine(Directory.GetCurrentDirectory(), "HaloWarsDE Mod Manager.exe");
                 shortcut.Description = $"Shortcut for the HWDE mod: {SelectedMod.Title}.";
                 shortcut.WorkingDirectory = Directory.GetCurrentDirectory();

@@ -127,6 +127,7 @@ namespace ModManifestMaker
                         ModID = deserialized.ModID;
                         ModName_TextBox.Text = deserialized.Required.Title;
                         ModAuthor_TextBox.Text = deserialized.Required.Author;
+                        ModVersion_TextBox.Text = deserialized.Required.Version;
                         ModFolder_TextBox.Text = new DirectoryInfo(mod_manifest.FileName + "\\").Parent.FullName;
 
                         // Optional data fields
@@ -149,11 +150,11 @@ namespace ModManifestMaker
                     if (result == MessageBoxResult.Yes)
                     {
                         File.Delete(hwmod_file);
-                        SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, ModID);
+                        SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, ModID);
                     }
                 }
                 else
-                    SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, ModID);
+                    SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, ModID);
 
                 _ = MessageBox.Show("Mod manifest saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }

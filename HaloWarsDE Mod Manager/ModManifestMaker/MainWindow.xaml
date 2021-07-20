@@ -4,84 +4,94 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Mod Manifest Designer" Height="710" Width="450" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
-    <Grid>
-        <GroupBox Header="Required" Margin="10,10,10,0"
-                  VerticalAlignment="Top" Height="190" FontSize="16" Foreground="Red">
-            <Grid>
-                <!-- Mod Name -->
-                <Label Content="Mod Name:" Margin="10,10,0,0" Padding="0,5"
-                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                       Width="110" Height="30" FontSize="14"/>
-                <TextBox x:Name="ModName_TextBox" Margin="0,10,10,0" TextWrapping="NoWrap"
-                       VerticalAlignment="Top" HorizontalAlignment="Right"
-                       Width="260" Height="30" FontSize="16" ToolTip="The name of your mod"
-                       TextChanged="RequiredData_TextChanged"/>
+        Title="Mod Manifest Designer" Height="760" Width="450" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style x:Key="LabelStyle" TargetType="{x:Type Label}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Width" Value="110"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="0,10"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+        <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="TextWrapping" Value="NoWrap"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="250"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <EventSetter Event="TextChanged" Handler="RequiredData_TextChanged"/>
+        </Style>
+        <Style x:Key="BrowseButtons" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="Height" Value="25"/>
+            <EventSetter Event="Click" Handler="FileBrowser_Click"/>
+        </Style>
+        <Style x:Key="BottomButtons" TargetType="{x:Type Button}">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="10,20"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+    </Window.Resources>
+    
+    <StackPanel Orientation="Vertical">
+        <GroupBox Header="Required" Margin="10" VerticalAlignment="Top" FontSize="16" Foreground="Red">
+            <StackPanel>
+                <DockPanel>
+                    <StackPanel Orientation="Vertical" DockPanel.Dock="Left" HorizontalAlignment="Left" Margin="10,0" Width="110">
+                        <Label Style="{StaticResource LabelStyle}" Content="Mod Name:"/>
+                        <Label Style="{StaticResource LabelStyle}" Content="Mod Author:"/>
+                        <Label Style="{StaticResource LabelStyle}" Content="Mod Version:"/>
+                        <Label Style="{StaticResource LabelStyle}" Content="Mod Folder:"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="10,0" Width="260">
+                        <TextBox x:Name="ModName_TextBox"    Style="{StaticResource TextBoxStyle}" ToolTip="The name of your mod"/>
+                        <TextBox x:Name="ModAuthor_TextBox"  Style="{StaticResource TextBoxStyle}" ToolTip="The name of whoever made this mod"/>
+                        <TextBox x:Name="ModVersion_TextBox" Style="{StaticResource TextBoxStyle}" ToolTip="The current version of your mod"/>
+                        <TextBox x:Name="ModFolder_TextBox"  Style="{StaticResource TextBoxStyle}" ToolTip="The directory containing your 'ModData' folder. This is where your .hwmod file will be put."/>
+                    </StackPanel>
+                </DockPanel>
 
-                <!-- Mod Author -->
-                <Label Content="Mod Author:" Margin="10,50,0,0" Padding="0,5"
-                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                       Width="110" Height="30" FontSize="14"/>
-                <TextBox x:Name="ModAuthor_TextBox" Margin="0,50,10,0" TextWrapping="NoWrap"
-                         VerticalAlignment="Top" HorizontalAlignment="Right"
-                         Width="260" Height="30" FontSize="16" ToolTip="The name of whoever made this mod"
-                         TextChanged="RequiredData_TextChanged"/>
+                <Button Style="{StaticResource BrowseButtons}" Name="ModFolder_Button" Content="Browse for Mod Folder"
+                        ToolTip="This folder should contain a 'ModData' folder within it that holds your mod's files!"/>
 
-                <!-- Mod Base Directory -->
-                <Label Content="Mod Folder:" Margin="10,90,0,0" Padding="0,5"
-                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                       Width="110" Height="30" FontSize="14"/>
-                <TextBox x:Name="ModFolder_TextBox" Margin="0,90,10,0" TextWrapping="NoWrap"
-                         VerticalAlignment="Top" HorizontalAlignment="Right"
-                         Width="260" Height="30" FontSize="16" ToolTip="The directory containing your 'ModData' folder. This is where your .hwmod file will be put."
-                         TextChanged="RequiredData_TextChanged"/>
-                <Button Name="ModFolder_Button" Content="Browse for Mod Folder" Margin="10,0,10,6"
-                        VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                        Width="390" Height="25" Click="FileBrowser_Click" ToolTip="This folder should contain a 'ModData' folder within it that holds your mod's files!"/>
-            </Grid>
+            </StackPanel>
         </GroupBox>
 
-        <GroupBox Header="Optional" Margin="10,210,10,0"
-                  VerticalAlignment="Top" Height="404" FontSize="16" Foreground="Red">
-            <Grid>
+        <GroupBox Header="Optional" Margin="10,-5" VerticalAlignment="Top" FontSize="16" Foreground="Red">
+            <StackPanel Orientation="Vertical">
                 <!-- Custom Banner Art -->
-                <Label Content="Custom Banner:" Margin="10,10" Padding="0,5"
-                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                       Width="110" Height="30" FontSize="14"/>
-                <TextBox x:Name="Banner_TextBox" Margin="0,10,10,0" TextWrapping="NoWrap" IsEnabled="False"
-                         VerticalAlignment="Top" HorizontalAlignment="Right"
-                         Width="260" Height="30" FontSize="16" ToolTip="The custom bitmap art that is displayed in the manager when the mod is selected." />
-                <Button Name="Banner_Button" Content="Browse for Custom Banner Art" Margin="10,50,10,0" IsEnabled="False"
-                        VerticalAlignment="Top" HorizontalAlignment="Center"
-                        Width="390" Height="25" Click="FileBrowser_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0">
+                    <Label Style="{StaticResource LabelStyle}" Content="Custom Banner:"/>
+                    <TextBox x:Name="Banner_TextBox" Style="{StaticResource TextBoxStyle}" IsEnabled="False" Margin="22,5"/>
+                </StackPanel>
+                <Button Style="{StaticResource BrowseButtons}" Name="Banner_Button" Content="Browse for Custom Banner Art" IsEnabled="False"/>
 
-                <!-- Custom Icon -->
-                <Label Content="Custom Icon:" Margin="10,90,0,0" Padding="0,5"
-                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                       Width="110" Height="30" FontSize="14"/>
-                <TextBox x:Name="Icon_TextBox" Margin="0,90,10,0" TextWrapping="NoWrap"
-                         VerticalAlignment="Top" HorizontalAlignment="Right" IsEnabled="False"
-                         Width="260" Height="30" FontSize="16" ToolTip="A custom icon used when making a shortcut to this mod via the mod manager." />
-                <Button Name="Icon_Button" Content="Browse for Custom Icon" Margin="10,130,10,0" IsEnabled="False"
-                        VerticalAlignment="Top" HorizontalAlignment="Center"
-                        Width="390" Height="25" Click="FileBrowser_Click"/>
+                <!-- Custom Icon Art -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0">
+                    <Label Style="{StaticResource LabelStyle}" Content="Custom Icon:"/>
+                    <TextBox x:Name="Icon_TextBox" Style="{StaticResource TextBoxStyle}" IsEnabled="False" Margin="22,5"/>
+                </StackPanel>
+                <Button Style="{StaticResource BrowseButtons}" Name="Icon_Button" Content="Browse for Custom Icon" IsEnabled="False"/>
 
                 <!-- Description -->
-                <Label Content="Description:" Margin="10,170,0,0" Padding="0,5"
-                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                       Width="110" Height="30" FontSize="14"/>
-                <TextBox x:Name="Desc_TextBox" Margin="10,205,0,0" TextWrapping="Wrap" AcceptsReturn="True"
-                         VerticalAlignment="Top" HorizontalAlignment="Left"
-                         Width="391" Height="161" FontSize="14" />
-            </Grid>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="10,0" Width="380">
+                    <Label Style="{StaticResource LabelStyle}" Content="Description:"/>
+                    <TextBox x:Name="Desc_TextBox" TextWrapping="Wrap" AcceptsReturn="True"
+                         Width="Auto" Height="160" FontSize="14" Margin="0,0,0,10"/>
+                </StackPanel>
+            </StackPanel>
         </GroupBox>
 
-        <Button Content="Open Manifest" FontSize="16" Margin="10,10"
-                VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                Width="150" Height="40" Click="OpenManifest_Click"/>
-        <Button x:Name="SaveButton" Content="Save Manifest" FontSize="16" Margin="10,10"
-                VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                Width="150" Height="40" IsEnabled="False" Click="SaveButton_Click"/>
-
-    </Grid>
+        <!-- Bottom Buttons -->
+        <DockPanel>
+            <Button DockPanel.Dock="Left"  Style="{StaticResource BottomButtons}" Content="Open Manifest" Click="OpenManifest_Click"/>
+            <Button DockPanel.Dock="Right" Style="{StaticResource BottomButtons}" Content="Save Manifest" Click="SaveButton_Click" x:Name="SaveButton" IsEnabled="False"/>
+        </DockPanel>
+    </StackPanel>
 </Window>

@@ -394,7 +394,7 @@ namespace AutoUpdater
 
             // Clean up
             Directory.Delete(extractDir, true);
-            
+
             // Restart mod manager if this was an auto update
             if (packageFilepath is null)
                 RestartManager();

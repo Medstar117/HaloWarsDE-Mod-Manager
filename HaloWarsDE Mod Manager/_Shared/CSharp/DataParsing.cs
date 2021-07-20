@@ -18,6 +18,7 @@ namespace DataSerialization
         public string ModID { get; }
         public string Title { get; }
         public string Author { get; }
+        public string Version { get; }
 
         // Optional data
         public string Description { get; }
@@ -47,6 +48,7 @@ namespace DataSerialization
                     ModID = mod_data.ModID;
                     Title = mod_data.Required.Title ?? "[Missing Element: Title]";
                     Author = mod_data.Required.Author ?? "[Missing Element: Author]";
+                    Version = mod_data.Required.Version ?? "[Missing Element: Version]";
 
                     // Optional data
                     Description = $"Author: {Author}\n\n{mod_data.Optional.Desc.Text ?? "[Missing Element: Description]"}";
@@ -61,7 +63,7 @@ namespace DataSerialization
                     //UpdateURLBranch = (UpdateURL != null && (UpdateURL.Host == "github.com" || UpdateURL.Host == "www.github.com")) ? deserialized.UpdateInfo.Branch : null;
 
                     // Manager data
-                    IsValid = ModID != null && ModID == Serializable.ManifestSerializer.EncodeString_SHA256($"<{Title}-{Author}>");
+                    IsValid = ModID != null && ModID == Serializable.ManifestSerializer.EncodeString_SHA256($"<{Title}-{Author}-{Version}>");
                     IsVanilla = false;
                     ManifestDirectory = Path.GetDirectoryName(manifestPath);
                 }
@@ -72,6 +74,7 @@ namespace DataSerialization
                 ModID = null;
                 Title = "Vanilla";
                 Author = "Ensemble Studios";
+                Version = "1.12185.2.0";
 
                 // Optional data
                 Description = $"Author: {Author}\n\nThe classic Halo Wars: Definitive Edition Experience.\n\nFinish the fight, commander!";
@@ -126,6 +129,9 @@ namespace DataSerialization
 
                 [XmlAttribute]
                 public string Author;
+
+                [XmlAttribute]
+                public string Version;
             }
 
             public class OptionalData
@@ -185,7 +191,7 @@ namespace DataSerialization
             };
 
             // Public functions
-            public static void SerializeManifest(string filename, string title, string author, string banner_path = null, string icon_path = null, string description = null, string mod_id = null)
+            public static void SerializeManifest(string filename, string title, string author, string version, string banner_path = null, string icon_path = null, string description = null, string mod_id = null)
             {
                 // Create new manifest object and remove namespaces
                 ModManifest serializable = new ModManifest();
@@ -194,6 +200,7 @@ namespace DataSerialization
                 // Set required data
                 serializable.Required.Title = title;
                 serializable.Required.Author = author;
+                serializable.Required.Version = version;
 
                 // Set optional data
                 serializable.Optional.Banner.RelativePath = banner_path;
@@ -201,7 +208,7 @@ namespace DataSerialization
                 serializable.Optional.Desc.Text = description;
 
                 // Create unique ModID for the mod; if ModID is provided, do not make a new one
-                serializable.ModID = mod_id ?? EncodeString_SHA256($"<{serializable.Required.Title}-{serializable.Required.Author}>");
+                serializable.ModID = mod_id ?? EncodeString_SHA256($"<{serializable.Required.Title}-{serializable.Required.Author}-{serializable.Required.Version}>");
 
                 // Write the .hwmod file to the mod's containing folder
                 using (XmlWriter writer = XmlWriter.Create(filename, xws))

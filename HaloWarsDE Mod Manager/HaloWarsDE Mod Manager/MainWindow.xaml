@@ -175,7 +175,10 @@
                  SelectionChanged="ModListBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Title}" Foreground="LightGray"/>
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Text="{Binding Title}" Foreground="LightGray" Width="173" DockPanel.Dock="Left"/>
+                        <TextBlock Text="{Binding Version}" Foreground="LightGray" Width="170" DockPanel.Dock="Right" TextAlignment="Right"/>
+                    </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

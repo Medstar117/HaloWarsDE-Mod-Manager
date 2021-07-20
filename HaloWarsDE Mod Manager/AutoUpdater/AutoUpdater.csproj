@@ -218,7 +218,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Program.old" />
     <Compile Include="..\_Shared\CSharp\DataParsing.cs">
       <Link>Shared\DataParsing.cs</Link>
     </Compile>

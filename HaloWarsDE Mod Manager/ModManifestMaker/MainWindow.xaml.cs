@@ -1,9 +1,12 @@
 ﻿// Built-Ins
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
-using Ookii.Dialogs.Wpf;
 using System.Windows.Controls;
+
+// Packages
+using Ookii.Dialogs.Wpf;
 
 // Personal
 using DataSerialization.Serializable;
@@ -20,6 +23,10 @@ namespace ModManifestMaker
         // Private variables
         private string ModID = null;
         private string HWMOD_Location = null;
+        private bool RequiredDataModified = false;
+
+        // Temporary variables
+        private string[] temp_Data = new string[4] { "", "", "", "" };
 
 
         // Main window initialization
@@ -52,7 +59,7 @@ namespace ModManifestMaker
         }
 
 
-        // GUI-bound functions
+        #region GUI-bound functions
         private void FileBrowser_Click(object sender, RoutedEventArgs e)
         {
             switch (((Button)sender).Name)
@@ -99,9 +106,14 @@ namespace ModManifestMaker
 
         private void RequiredData_TextChanged(object sender, TextChangedEventArgs e)
         {
-            SaveButton.IsEnabled = (ModName_TextBox.Text != "") && (ModAuthor_TextBox.Text != "") && (ModFolder_TextBox.Text != "") && Directory.Exists(ModFolder_TextBox.Text + "\\");
+            SaveButton.IsEnabled = (ModName_TextBox.Text != "") && (ModAuthor_TextBox.Text != "") && (ModFolder_TextBox.Text != "") && (ModVersion_TextBox.Text != "") && Directory.Exists(ModFolder_TextBox.Text + "\\");
             Banner_TextBox.IsEnabled = Banner_Button.IsEnabled = Icon_Button.IsEnabled = Icon_TextBox.IsEnabled = (ModFolder_TextBox.Text != "" && Directory.Exists(ModFolder_TextBox.Text + "\\"));
             Banner_Button.ToolTip = Icon_Button.ToolTip = (ModFolder_TextBox.Text != "" && Directory.Exists(ModFolder_TextBox.Text + "\\")) ? null : "Your mod's base directory must be a valid directory on your filesystem!";
+
+            RequiredDataModified = !temp_Data.Contains(ModName_TextBox.Text) ||
+                                   !temp_Data.Contains(ModAuthor_TextBox.Text) ||
+                                   !temp_Data.Contains(ModVersion_TextBox.Text) ||
+                                   !temp_Data.Contains(ModFolder_TextBox.Text);
         }
 
         private void OpenManifest_Click(object sender, RoutedEventArgs e)
@@ -125,15 +137,21 @@ namespace ModManifestMaker
                     case "1":
                         // Required data fields
                         ModID = deserialized.ModID;
-                        ModName_TextBox.Text = deserialized.Required.Title;
-                        ModAuthor_TextBox.Text = deserialized.Required.Author;
-                        ModVersion_TextBox.Text = deserialized.Required.Version;
-                        ModFolder_TextBox.Text = new DirectoryInfo(mod_manifest.FileName + "\\").Parent.FullName;
+                        temp_Data = new string[4] { deserialized.Required.Title,
+                                                    deserialized.Required.Author,
+                                                    deserialized.Required.Version,
+                                                    Path.GetDirectoryName(mod_manifest.FileName) };
+
+                        // Temp data is set first so that the data check after assignment works
+                        ModName_TextBox.Text    = temp_Data[0];
+                        ModAuthor_TextBox.Text  = temp_Data[1];
+                        ModVersion_TextBox.Text = temp_Data[2];
+                        ModFolder_TextBox.Text  = temp_Data[3];
 
                         // Optional data fields
                         Banner_TextBox.Text = deserialized.Optional.Banner.RelativePath;
-                        Icon_TextBox.Text = deserialized.Optional.Icon.RelativePath;
-                        Desc_TextBox.Text = deserialized.Optional.Desc.Text;
+                        Icon_TextBox.Text   = deserialized.Optional.Icon.RelativePath;
+                        Desc_TextBox.Text   = deserialized.Optional.Desc.Text;
                         break;
                 }
             }
@@ -150,11 +168,11 @@ namespace ModManifestMaker
                     if (result == MessageBoxResult.Yes)
                     {
                         File.Delete(hwmod_file);
-                        SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, ModID);
+                        SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, RequiredDataModified ? null : ModID);
                     }
                 }
                 else
-                    SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, ModID);
+                    SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, RequiredDataModified ? null : ModID);
 
                 _ = MessageBox.Show("Mod manifest saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -163,5 +181,6 @@ namespace ModManifestMaker
                 _ = MessageBox.Show($"{error.Message}\n\n\n{error.StackTrace}", "Exception Caught", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        #endregion
     }
 }

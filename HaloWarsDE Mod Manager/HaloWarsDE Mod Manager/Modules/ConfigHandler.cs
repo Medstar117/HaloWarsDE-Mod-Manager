@@ -132,10 +132,10 @@ namespace HaloWarsDE_Mod_Manager.Modules
                 serializer.Serialize(writer, config, xns);
 
             if (!newly_created)
-                MainWindow.RelocateDataFolder("RESTORE");
+                MainWindow.RelocateDataFolder(MainWindow.RelocateActions.Restore);
 
             LoadConfig();
-            MainWindow.RelocateDataFolder("REPLACE");
+            MainWindow.RelocateDataFolder(MainWindow.RelocateActions.Replace);
             ModScan();
         }
 

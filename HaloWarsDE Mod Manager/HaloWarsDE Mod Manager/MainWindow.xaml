@@ -7,6 +7,31 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
     <Window.Resources>
+        <!-- This causes an annoying "Source Binding" error due to the parent element instantiating after this is initialized. Ignore the DataContext error when debugging -->
+        <!-- Need to also make this templatable -->
+        <VisualBrush x:Key="Background.Animated" Stretch="Fill">
+            <VisualBrush.Visual>
+                <MediaElement Name="LoopedAnimation" Stretch="UniformToFill" IsMuted="True">
+                    <MediaElement.Triggers>
+                        <EventTrigger RoutedEvent="MediaElement.Loaded">
+                            <EventTrigger.Actions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <MediaTimeline Source="Assets/Videos/background_main.wmv"
+                                                       Storyboard.Target="{Binding ElementName=LoopedAnimation}"
+                                                       RepeatBehavior="Forever" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger.Actions>
+                        </EventTrigger>
+                    </MediaElement.Triggers>
+                    <MediaElement.OpacityMask>
+                        <ImageBrush ImageSource="pack://application:,,,/Assets/Layout/opacity_mask.png" Stretch="Fill"/>
+                    </MediaElement.OpacityMask>
+                </MediaElement>
+            </VisualBrush.Visual>
+        </VisualBrush>
+        
         <!-- Colors -->
         <Color x:Key="Forerunner.Cyan" A="#FF" R="#AA" G="#FF" B="#FF"/>
 
@@ -103,29 +128,10 @@
         </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid Background="{StaticResource Background.Animated}">
         <!-- Main GUI Layout and Background -->
-        <MediaElement x:Name="BackgroundAnimation">
-            <MediaElement.Triggers>
-                <EventTrigger RoutedEvent="MediaElement.Loaded">
-                    <EventTrigger.Actions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <MediaTimeline Source="Assets/Videos/background_main.wmv"
-                                               Storyboard.TargetName="BackgroundAnimation"
-                                               RepeatBehavior="Forever"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger.Actions>
-                </EventTrigger>
-            </MediaElement.Triggers>
-            <MediaElement.OpacityMask>
-                <ImageBrush ImageSource="pack://application:,,,/Assets/Layout/opacity_mask.png" Stretch="Fill"/>
-            </MediaElement.OpacityMask>
-        </MediaElement>
         <Image Source="pack://application:,,,/Assets/Layout/new_layout_with_image.png" Stretch="Fill"/>
-        <!-- <Image Stretch="Fill" Width="400" Height="150" Margin="478,98,82,232"/> -->
-
+        
         <!-- Mod Content -->
         <ListBox x:Name="ModListBox" ItemsSource="{Binding ModList}"
                  VerticalAlignment="Top" HorizontalAlignment="Left"

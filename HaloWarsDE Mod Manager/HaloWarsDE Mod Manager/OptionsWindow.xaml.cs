@@ -55,7 +55,7 @@ namespace HaloWarsDE_Mod_Manager
             FilePathTextBox.Text = UserModsFolder;
             TimeoutDelay_IntUpDwn.Value = TimeoutDelay;
             ModManagerVerLabel.Content = $"Mod Manager Version: {ManagerVer}";
-            AddModsToList();
+            //AddModsToList();
         }
 
         // ----- Window Functions -----
@@ -119,7 +119,7 @@ namespace HaloWarsDE_Mod_Manager
         }
 
 
-        // ----- Settings Functions -----
+        #region Settings Functions
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // Write new config data if either DataModified flag is set to "true"
@@ -168,9 +168,9 @@ namespace HaloWarsDE_Mod_Manager
             // Set DataModified flag
             ModPathModified = FilePathTextBox.Text != UserModsFolder;
         }
+        #endregion
 
-
-        // ----- Downloader Functions -----
+        #region Downloader Functions
         private void Button_DownloadMod_Click(object sender, RoutedEventArgs e)
         {
             Mod SelectedMod = ListBox_DownloadableModsList.SelectedItem as Mod;
@@ -352,12 +352,11 @@ namespace HaloWarsDE_Mod_Manager
                 }
             }
         }
+        #endregion
 
-        
     }
 
-
-    // ----- Custom Classes -----
+    #region Custom Classes
     public class UrlTestClient : WebClient
     {
         /********************************************************************
@@ -427,4 +426,5 @@ namespace HaloWarsDE_Mod_Manager
         }
     }
     */
+    #endregion
 }

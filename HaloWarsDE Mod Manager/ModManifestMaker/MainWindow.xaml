@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Mod Manifest Designer" Height="760" Width="450" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="Mod Manifest Maker" Height="760" Width="450" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style x:Key="LabelStyle" TargetType="{x:Type Label}">
             <Setter Property="FontSize" Value="14"/>

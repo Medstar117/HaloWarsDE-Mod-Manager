@@ -1,10 +1,9 @@
 # Miscellaneous
 HaloWarsDE Mod Manager/.vs
-HaloWarsDE Mod Manager/_Releases
-HaloWarsDE Mod Manager/_Builds
+HaloWarsDE Mod Manager/_Build
+HaloWarsDE Mod Manager/_7zip
 HaloWarsDE Mod Manager/WebScraper
 HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/bin
-HaloWarsDE Mod Manager/Extras
 
 # UWP.ProcFetcher
 HaloWarsDE Mod Manager/UWP.ProcFetcher/bin
@@ -25,6 +24,4 @@ HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/obj
 # Files
 
 # File Extensions
-*.ilk
-*.pdb
 *.old

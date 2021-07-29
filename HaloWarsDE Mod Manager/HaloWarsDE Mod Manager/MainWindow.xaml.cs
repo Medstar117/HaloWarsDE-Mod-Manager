@@ -90,7 +90,7 @@ namespace HaloWarsDE_Mod_Manager
                 // If the handler result is true, then that means the manager has just booted up
                 // It would be false if this were a first-time setup
                 if (handler_result)
-                    RelocateDataFolder("REPLACE");
+                    RelocateDataFolder(RelocateActions.Replace);
 
                 // Scan for mods
                 ModScan();
@@ -118,7 +118,13 @@ namespace HaloWarsDE_Mod_Manager
         }
 
         // ---------- General-Purpose ----------
-        public static void RelocateDataFolder(string action)
+        public enum RelocateActions
+        {
+            Replace,
+            Restore
+        }
+
+        public static void RelocateDataFolder(RelocateActions action)
         {
             /*********************************************************
             * Move GameConfig.dat to the user's mods folder and create
@@ -141,7 +147,7 @@ namespace HaloWarsDE_Mod_Manager
             {
                 // Replace the selected Halo Wars LocalAppData folder with a junction pointing to the user's selected mods folder.
                 // Also move GameConfig.dat to the user's selected mods folder.
-                case "REPLACE":
+                case RelocateActions.Replace:
                     WriteLogEntry("Relocating GameConfig.dat to user's mods directory...");
                     File.Move(GameLocalAppDataDir_DatFile, UserModsDir_DatFile);                       // Move GameConfig.dat from the game's LocalAppData folder to the user's mods folder
                     Directory.Delete(LocalAppData_Selected, true);                                           // Delete the game's original LocalAppData folder
@@ -152,7 +158,7 @@ namespace HaloWarsDE_Mod_Manager
 
                 // Remove the junction in the selected Halo Wars LocalAppData folder and re-create the original folder.
                 // Also move GameConfig.dat back into the original folder.
-                case "RESTORE":
+                case RelocateActions.Restore:
                     WriteLogEntry("Removing the Halo Wars LocalAppData directory junction...");
                     JunctionPoint.Delete(LocalAppData_Selected);                                       // Delete the directory junction
                     _ = Directory.CreateDirectory(LocalAppData_Selected);                                  // Re-Create the game's LocalAppData folder
@@ -174,7 +180,7 @@ namespace HaloWarsDE_Mod_Manager
             WriteLogEntry("Cleaning up Halo Wars AppData directory...");
 
             // Revert junction for the Halo Wars Local AppData directory.
-            RelocateDataFolder("RESTORE");
+            RelocateDataFolder(RelocateActions.Restore);
 
             // Remove ModManifest.txt.
             if (File.Exists(ModManifestFile))

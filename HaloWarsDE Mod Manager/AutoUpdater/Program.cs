@@ -12,58 +12,52 @@ using Newtonsoft.Json;
 // Personal
 using DataSerialization.AutoUpdater.XML;
 using DataSerialization.AutoUpdater.JSON;
+using static AutoUpdater.Constants;
 
 namespace AutoUpdater
 {
     public class PatchData
     {
-        // "Global" Data
         public Version Version { get; }
         public Uri FileURI { get; }
-        private Uri RepoReleaseURI { get; set; }
+        private Uri RepoReleaseURI => new Uri($"{MainRepoURL}/releases/latest");
 
-        public Uri GrabPatchFileUri(Release releaseData, string ReleasePackageName)
+        public Uri GrabPatchFileUri(Release releaseData)
         {
             /*************************************************
             * Loop through the data to find the download link
             * for the release (the AutoUpdatePackage.zip file).
             *************************************************/
 
-            Uri temp = null;
-
-            for (int i = 0; i < releaseData.assets.Count; ++i)
+            foreach (ReleaseAsset asset in releaseData.assets)
             {
-                if (releaseData.assets[i].name == ReleasePackageName)
+                if (asset.name == ReleasePackageName)
                 {
-                    temp = new Uri(releaseData.assets[i].browser_download_url);
-                    break;
+                    return new Uri(asset.browser_download_url);
                 }
             }
 
-            return temp;
+            return null; // Just in case no package is found
         }
 
-        public PatchData(string MainRepoURL, string ReleasePackageName)
+        public PatchData()
         {
             try
             {
-                RepoReleaseURI = new Uri($"{MainRepoURL}/releases/latest");
-                using (WebClient client = new WebClient())
+                using (WebClient github_client = new WebClient())
                 {
-                    // ========== GET LATEST RELEASE'S JSON DATA ==========
-
-                    client.Headers.Add("user-agent", "HaloWarsDE Mod Manager"); // This is needed by GitHub's API. Really, it can be anything, but it's recommended to either be one's username or the name of one's application
+                    github_client.Headers.Add("user-agent", "HaloWarsDE Mod Manager"); // Requried by GitHub's API
                     Program.ColorWriteLine("Checking for new version...");
 
                     // Download JSON data and set it to a Release-type object
                     Program.ColorWrite("\t--Downloading JSON data for repository's latest release...", ConsoleColor.Yellow);
-                    string releaseJSON = client.DownloadString(RepoReleaseURI);
+                    string releaseJSON = github_client.DownloadString(RepoReleaseURI);
                     Release releaseInfo = JsonConvert.DeserializeObject<Release>(releaseJSON);
                     Program.ColorWriteLine("Done!", ConsoleColor.Green);
 
                     // Set latest release's data to variables
                     Program.ColorWrite("\t--Parsing JSON data...", ConsoleColor.Yellow);
-                    FileURI = GrabPatchFileUri(releaseInfo, ReleasePackageName);
+                    FileURI = GrabPatchFileUri(releaseInfo);
                     Version = new Version(releaseInfo.tag_name);
                     Program.ColorWriteLine("Done!", ConsoleColor.Green);
 
@@ -75,27 +69,18 @@ namespace AutoUpdater
                     }
                     else
                         Program.ColorWriteLine("Found all data for updating!\n", ConsoleColor.Green);
+
                 }
             }
             catch (WebException)
             {
                 Program.ColorWriteLine("[ERROR] Could not fetch latest release info!", ConsoleColor.Red);
-                Environment.Exit(-1);
             }
         }
     }
 
     public class Program
     {
-        // Constants
-        public const string ReleasePackageName = "AutoUpdatePackage.zip";
-        public const string MainRepoURL = "https://api.github.com/repos/Medstar117/HWDE-Mod-Manager";
-
-        // Globals
-        public static string InstallationDirectory = Directory.GetCurrentDirectory();
-        public static string UpdatesDirectory = Path.Combine(InstallationDirectory, "Updates");
-        public static string PrerequisitesDirectory = Path.Combine(UpdatesDirectory, "Prerequisites");
-
         public static void Main(string[] args)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -119,31 +104,42 @@ namespace AutoUpdater
                  *      Manual Update:         -u --manual Mod_Manager_Version "full\\path\\to\\AutoUpdatePackage.zip"
                  */
 
-                // Local Variables
-                PatchData LatestPatch = new PatchData(MainRepoURL, ReleasePackageName);
-                Version currentVer = new Version(args[2]);
-
+                PatchData latest_patch = new PatchData();
                 switch (args[0].ToLower())            // Check the mode detected
                 {
+                    // Check for updates
                     case "-c":
-                        CheckForUpdates(ref currentVer, LatestPatch.Version);
+                        if (latest_patch.Version > new Version(args[1]))
+                        {
+                            ColorWriteLine("Update available!", ConsoleColor.Green);
+                            Environment.Exit(1);
+                        }
+                        else
+                        {
+                            ColorWriteLine("No update available!", ConsoleColor.Yellow);
+                            Environment.Exit(0);
+                        }
                         break;
 
+                    // Apply update package
                     case "-u":
-                        switch (args[1].ToLower())    // Check if the update is automatic or manual
+                        Version managerVer = new Version(args[2]);
+                        switch (args[1].ToLower())
                         {
-                            case "--auto":            // Apply update from repository automatically
-                                CheckForRunningModManager(int.Parse(args[3]));
-                                ApplyUpdate(ref currentVer, UpdatesDirectory, LatestPatch);
+                            case "--auto":
+                                CheckForRunningInstance(int.Parse(args[3]));
+                                ApplyUpdate(ref managerVer, LatestPatchData: latest_patch);
                                 break;
 
-                            case "--manual":         // Apply update package manually--should only be performed by the AutoUpdater itself since it doesn't ask for the manager's PID!
-                                ApplyUpdate(ref currentVer, PrerequisitesDirectory, null, $"{args[3]}");
+                            case "--manual":
+                                ApplyUpdate(ref managerVer, packageZip: $"{args[3]}");
                                 break;
                         }
                         break;
 
+                    // No action; user probably launched the application manually
                     default:
+                        Environment.Exit(0);
                         break;
                 }
             }
@@ -155,29 +151,30 @@ namespace AutoUpdater
         }
 
 
-        // ========== GENERAL FUNCTIONS ==========
-
+        #region General Purpose Functions
         public static void ColorWrite(string text, ConsoleColor foreground = ConsoleColor.White, ConsoleColor background = ConsoleColor.Black)
         {
             Console.ForegroundColor = foreground;
             Console.BackgroundColor = background;
             Console.Write(text);
+            Console.ResetColor();
         }
 
         public static void ColorWriteLine(string text, ConsoleColor foreground = ConsoleColor.White, ConsoleColor background = ConsoleColor.Black)
         {
             Console.ForegroundColor = foreground;
             Console.BackgroundColor = background;
-            Console.Write(text + "\n");
+            Console.WriteLine(text);
+            Console.ResetColor();
         }
 
-        private static void CheckForRunningModManager(int pid)
+        private static void CheckForRunningInstance(int pid)
         {
             /***********************************************************
              * Check if the mod manager is still running or not.
              * Ensures that the manager is closed before doing anything.
              **********************************************************/
-                        
+
             try
             {
                 ColorWriteLine("Checking for running mod manager process...", ConsoleColor.Yellow);
@@ -197,37 +194,6 @@ namespace AutoUpdater
             }
         }
 
-        private static string ExtractFromPackage(string patchzip, string filename, string destination = null)
-        {
-            /*************************************************
-            * Extract all files from the downloaded .zip file
-            * to the given .zip file's current directory.
-            * 
-            * This may need to be optimized at some point.
-            *************************************************/
-
-            // Unzip the archive
-            string extractPath = null;
-            using (ZipArchive AutoUpdaterZip = ZipFile.OpenRead(patchzip))
-            {
-                foreach (ZipArchiveEntry packedFile in AutoUpdaterZip.Entries)
-                {
-                    if (packedFile.Name == filename)
-                    {
-                        // If a destination is not specified, extract to the update package's directory
-                        extractPath = (destination is null) ?
-                                       Path.Combine(new FileInfo(patchzip).DirectoryName, filename) :
-                                       Path.Combine(destination, filename);
-
-                        packedFile.ExtractToFile(extractPath);
-                        break;
-                    }
-                }
-            }
-
-            return extractPath;
-        }
-
         private static void RestartManager()
         {
             ColorWrite("Restarting mod manager...", ConsoleColor.Yellow);
@@ -242,91 +208,87 @@ namespace AutoUpdater
             ColorWriteLine("launched!", ConsoleColor.Green);
             Environment.Exit(0);
         }
+        #endregion
 
 
-        // ========== MAIN FUNCTIONS ==========
-
-        private static void CheckForUpdates(ref Version currentVer, Version patchVer)
+        #region Update-Handling Functions
+        private static string ExtractFromPackage(string patchZip, string filename, string destination = null)
         {
-            if (patchVer > currentVer)
+            /*************************************************
+            * Extract all files from the downloaded .zip file
+            * to the given .zip file's current directory.
+            * 
+            * This may need to be optimized at some point.
+            *************************************************/
+
+            // Unzip the archive
+            string extractPath = null;
+            using (ZipArchive AutoUpdaterZip = ZipFile.OpenRead(patchZip))
             {
-                ColorWriteLine("Update available!", ConsoleColor.Green);
-                Environment.Exit(1);
-            }
-            else
-            {
-                ColorWriteLine("No update available!", ConsoleColor.Yellow);
-                Environment.Exit(0);
-            }
-        }
-
-        private static void ParseInstruction(UpdateInstructions.Instruction instruction, string packageFilepath)
-        {
-            switch (instruction.Action)
-            {
-                case "MOVE":
-                    // Set the expected filepath
-                    string fileMovePath = (instruction.FileDirectory == "ROOT") ?
-                                           Path.Combine(InstallationDirectory, instruction.FileName) :
-                                           Path.Combine(InstallationDirectory, instruction.FileDirectory, instruction.FileName);
-
-                    // Delete old file if it exists
-                    if (File.Exists(fileMovePath))
-                        File.Delete(fileMovePath);
-
-                    // Extract the file from the update package to the desired directory
-                    _ = ExtractFromPackage(packageFilepath, instruction.FileName, fileMovePath);
-                    break;
-
-                case "DELETE":
-                    // Set the expected filepath
-                    string fileDeletePath = (instruction.FileDirectory == "ROOT") ?
-                                             Path.Combine(InstallationDirectory, instruction.FileName) :
-                                             Path.Combine(InstallationDirectory, instruction.FileDirectory, instruction.FileName);
-                    
-                    // Delete the specified file, if it exists
-                    if (File.Exists(fileDeletePath))
-                        File.Delete(fileDeletePath);
-
-                    break;
-            }
-        }
-
-        private static void ApplyUpdate(ref Version currentVer, string extractDir, PatchData patch = null, string packageFilepath = null)
-        {
-            // Create temporary directory for update package
-            if (!Directory.Exists(extractDir))
-            {
-                ColorWrite($"Creating extraction directory \"{extractDir}\"...");
-                _ = Directory.CreateDirectory(extractDir);
-                ColorWriteLine("Done!", ConsoleColor.Green);
-            }
-
-            // Check if this is a manual or auto update
-            if (packageFilepath is null)
-            {
-                // Downloads the newest update package if this is an auto update
-                packageFilepath = Path.Combine(extractDir, ReleasePackageName);
-                using (WebClient client = new WebClient())
+                foreach (ZipArchiveEntry packedFile in AutoUpdaterZip.Entries)
                 {
-                    client.Headers.Add("user-agent", "HaloWarsDE Mod Manager");
-                    ColorWrite("Downloading latest update package...");
-                    client.DownloadFile(patch.FileURI, packageFilepath);
-                    ColorWriteLine("Done!", ConsoleColor.Green);
+                    if (packedFile.Name == filename)
+                    {
+                        // If a destination is not specified, extract to the update package's directory
+                        extractPath = (destination is null) ?
+                                       Path.Combine(Path.GetDirectoryName(patchZip), filename) :
+                                       Path.Combine(destination, filename);
+
+                        packedFile.ExtractToFile(extractPath);
+                        break;
+                    }
                 }
             }
 
-            // Extract and parse "updates.dat"
+            return extractPath; // Just in case the file couldn't be found
+        }
+
+        private static UpdateInstructions ExtractUpdateData(ref string packageZip)
+        {
             ColorWrite("Analyzing 'updates.dat'...");
-            string updatesFile = ExtractFromPackage(packageFilepath, "updates.dat");
+            string updatesFile = ExtractFromPackage(packageZip, "updates.dat");
             UpdateInstructions updateData = new XmlDeserializer().GetUpdateInstructions(updatesFile);
             File.Delete(updatesFile);
             ColorWriteLine("Done!", ConsoleColor.Green);
+            return updateData;
+        }
 
-            // Check for prerequisites
+        private static void InstallPackageContents(ref UpdateInstructions updateData, string packageZip)
+        {
+            foreach (UpdateInstructions.Instruction instruction in updateData.InstructionList)
+            {
+                // Expected filepath to work with
+                string instructionFilepath = (instruction.FileDirectory == "ROOT") ?
+                                              Path.Combine(InstallationDirectory, instruction.FileName) :
+                                              Path.Combine(InstallationDirectory, instruction.FileDirectory, instruction.FileName);
+
+                switch (instruction.Action)
+                {
+                    case "MOVE":
+                        // Delete old file if it exists
+                        if (File.Exists(instructionFilepath))
+                            File.Delete(instructionFilepath);
+
+                        // Extract the file from the update package to the desired directory
+                        _ = ExtractFromPackage(packageZip, instruction.FileName, instructionFilepath);
+                        break;
+
+                    case "DELETE":
+                        // Delete the specified file, if it exists
+                        if (File.Exists(instructionFilepath))
+                            File.Delete(instructionFilepath);
+                        break;
+                }
+            }
+            ColorWriteLine("Done!", ConsoleColor.Green);
+        }
+
+        private static void FetchPrerequisites(ref UpdateInstructions updateData, ref Version managerVer)
+        {
             ColorWrite("\nChecking for any prerequisite versions...");
             if (updateData.Prerequisites.Length > 0)
             {
+                // Create prerequisites directory
                 ColorWriteLine($"detected {updateData.Prerequisites.Length} prerequisite versions needed!", ConsoleColor.Yellow);
                 if (!Directory.Exists(PrerequisitesDirectory))
                     Directory.CreateDirectory(PrerequisitesDirectory);
@@ -336,10 +298,10 @@ namespace AutoUpdater
                 using (WebClient client = new WebClient())
                 {
                     client.Headers.Add("user-agent", "HaloWarsDE Mod Manager");
-                    foreach (var prereq in updateData.Prerequisites)
+                    foreach (UpdateInstructions.Prerequisite prereq in updateData.Prerequisites)
                     {
                         // Check if the mod manager has met the current prerequisite version
-                        if (new Version(prereq.Version) > currentVer)
+                        if (new Version(prereq.Version) > managerVer)
                         {
                             ColorWrite($"\t--Downloading required version: {prereq.Version}...", ConsoleColor.Yellow);
 
@@ -362,43 +324,71 @@ namespace AutoUpdater
                 if (prereqUpdatePackages.Count > 0)
                 {
                     ColorWriteLine("\nInstalling downloaded prerequisites...");
-                    foreach (KeyValuePair<Version, string> prereqPackageFile in prereqUpdatePackages)
+                    foreach (KeyValuePair<Version, string> prereqPackageZip in prereqUpdatePackages)
                     {
-                        ColorWrite($"\t--Installing prerequisite version: {prereqPackageFile.Key}...", ConsoleColor.Yellow);
+                        ColorWrite($"\t--Installing prerequisite version: {prereqPackageZip.Key}...", ConsoleColor.Yellow);
                         ProcessStartInfo PrereqInfo = new ProcessStartInfo
                         {
                             CreateNoWindow = true,
                             UseShellExecute = false,
-                            FileName = Path.Combine(Directory.GetCurrentDirectory(), "AutoUpdater.exe"),
-                            Arguments = $"-u --manual {currentVer} \"{prereqPackageFile.Value}\""
+                            FileName = Path.Combine(InstallationDirectory, "AutoUpdater.exe"),
+                            Arguments = $"-u --manual {managerVer} \"{prereqPackageZip.Value}\""
                         };
                         Process AutoUpdater = new Process { StartInfo = PrereqInfo };
-                        AutoUpdater.Start();
+                        _ = AutoUpdater.Start();
                         AutoUpdater.WaitForExit();
                         ColorWriteLine("Done!", ConsoleColor.Green);
                     }
                 }
-
-                // Clean up
-                if (patch != null)
-                    Directory.Delete(PrerequisitesDirectory, true);
             }
             else
-                ColorWriteLine("no prerequisite versions detected!", ConsoleColor.Green);
+                ColorWriteLine("None!", ConsoleColor.Green);
+        }
 
-            // Install package contents to their respectful locations
-            ColorWrite($"\nInstalling version {patch.Version}'s contents...");
-            foreach (var instruction in updateData.InstructionList)
-                ParseInstruction(instruction, packageFilepath);
-            ColorWriteLine("Done!", ConsoleColor.Green);
+        private static void ApplyUpdate(ref Version managerVer, PatchData LatestPatchData = null, string packageZip = null)
+        {
+            // Check what kind of update we're doing
+            bool IsAutoUpdate = LatestPatchData != null;
+
+            // If this is an auto-update, download the latest AutoUpdatePackage.zip
+            if (IsAutoUpdate)
+            {
+                // Create updates directory
+                if (!Directory.Exists(UpdatesDirectory))
+                {
+                    ColorWrite($"Creating extraction directory \"{UpdatesDirectory}\"...");
+                    _ = Directory.CreateDirectory(UpdatesDirectory);
+                    ColorWriteLine("done!", ConsoleColor.Green);
+                }
+
+                packageZip = Path.Combine(UpdatesDirectory, ReleasePackageName);
+                using (WebClient client = new WebClient())
+                {
+                    client.Headers.Add("user-agent", "HaloWarsDE Mod Manager");
+                    ColorWrite("Downloading latest update package...");
+                    client.DownloadFile(LatestPatchData.FileURI, packageZip);
+                    ColorWriteLine("done!", ConsoleColor.Green);
+                }
+            }
+
+            // Extract and parse "updates.dat"
+            UpdateInstructions updateData = ExtractUpdateData(ref packageZip);
+
+            // Check for and install prerequisites
+            if (IsAutoUpdate)
+                FetchPrerequisites(ref updateData, ref managerVer);
+
+            // Install the current package
+            InstallPackageContents(ref updateData, packageZip);
 
             // Clean up
-            Directory.Delete(extractDir, true);
+            Directory.Delete(Path.GetDirectoryName(packageZip), true);
 
-            // Restart mod manager if this was an auto update
-            if (packageFilepath is null)
+            // Restart manager if this was an auto-update
+            if (IsAutoUpdate)
                 RestartManager();
         }
+        #endregion
 
     }
 }

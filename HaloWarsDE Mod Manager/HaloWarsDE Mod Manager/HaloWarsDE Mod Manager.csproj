@@ -47,7 +47,7 @@
 	</AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\Icon_Blagoicons.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -319,6 +319,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Icon_Blagoicons.ico" />
     <Resource Include="Assets\Layout\new_layout.png" />
     <Resource Include="Assets\Layout\new_layout_with_image.png" />
     <Resource Include="Assets\Layout\opacity_mask.png" />

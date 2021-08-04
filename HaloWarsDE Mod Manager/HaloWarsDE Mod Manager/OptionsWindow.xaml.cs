@@ -3,6 +3,8 @@ using System;
 using System.IO;
 using System.Net;
 using System.Windows;
+using System.Diagnostics;
+using System.Windows.Navigation;
 using System.Windows.Media;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -67,6 +69,12 @@ namespace HaloWarsDE_Mod_Manager
                 if ((TabDisplay.Items[index] as TabItem).Header.ToString() == buttonPressed)
                     TabDisplay.SelectedIndex = index;
 
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
 
         private void AddModsToList()
@@ -156,7 +164,7 @@ namespace HaloWarsDE_Mod_Manager
             };
 
             // Show the File Explorer window and protect GameConfig.dat from being deleted accidentally
-            using (FileStream protectGameConfig = new FileStream(MainWindow.GameConfigFile_UMF, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (FileStream protectGameConfig = new FileStream(App.Constants.GameConfigFile_UMF, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 // If the dialog box is showing, set the text box to be the selected path
                 if (dialog.ShowDialog() == true)

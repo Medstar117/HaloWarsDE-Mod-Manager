@@ -1,4 +1,5 @@
 # Miscellaneous
+HaloWarsDE Mod Manager/_Other Art
 HaloWarsDE Mod Manager/.vs
 HaloWarsDE Mod Manager/_Build
 HaloWarsDE Mod Manager/_7zip
@@ -25,3 +26,4 @@ HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/obj
 
 # File Extensions
 *.old
+desktop.ini

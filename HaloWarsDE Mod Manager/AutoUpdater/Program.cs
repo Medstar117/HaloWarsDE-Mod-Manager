@@ -20,7 +20,7 @@ namespace AutoUpdater
     {
         public Version Version { get; }
         public Uri FileURI { get; }
-        private Uri RepoReleaseURI => new Uri($"{MainRepoURL}/releases/latest");
+        private Uri RepoReleaseURI => new Uri($"{ApiRepoURL}/releases/latest");
 
         public Uri GrabPatchFileUri(Release releaseData)
         {
@@ -75,6 +75,7 @@ namespace AutoUpdater
             catch (WebException)
             {
                 Program.ColorWriteLine("[ERROR] Could not fetch latest release info!", ConsoleColor.Red);
+                Environment.Exit(0);
             }
         }
     }
@@ -127,6 +128,8 @@ namespace AutoUpdater
                         switch (args[1].ToLower())
                         {
                             case "--auto":
+                                if (Directory.Exists(UpdatesDirectory))
+                                    Directory.Delete(UpdatesDirectory, true);
                                 CheckForRunningInstance(int.Parse(args[3]));
                                 ApplyUpdate(ref managerVer, LatestPatchData: latest_patch);
                                 break;
@@ -258,16 +261,14 @@ namespace AutoUpdater
             foreach (UpdateInstructions.Instruction instruction in updateData.InstructionList)
             {
                 // Expected filepath to work with
-                string instructionFilepath = (instruction.FileDirectory == "ROOT") ?
-                                              Path.Combine(InstallationDirectory, instruction.FileName) :
-                                              Path.Combine(InstallationDirectory, instruction.FileDirectory, instruction.FileName);
+                string instructionFilepath = (instruction.FileDirectory == "ROOT") ? InstallationDirectory : Path.Combine(InstallationDirectory, instruction.FileDirectory);
 
                 switch (instruction.Action)
                 {
                     case "MOVE":
                         // Delete old file if it exists
-                        if (File.Exists(instructionFilepath))
-                            File.Delete(instructionFilepath);
+                        if (File.Exists(Path.Combine(instructionFilepath, instruction.FileName)))
+                            File.Delete(Path.Combine(instructionFilepath, instruction.FileName));
 
                         // Extract the file from the update package to the desired directory
                         _ = ExtractFromPackage(packageZip, instruction.FileName, instructionFilepath);
@@ -275,8 +276,8 @@ namespace AutoUpdater
 
                     case "DELETE":
                         // Delete the specified file, if it exists
-                        if (File.Exists(instructionFilepath))
-                            File.Delete(instructionFilepath);
+                        if (File.Exists(Path.Combine(instructionFilepath, instruction.FileName)))
+                            File.Delete(Path.Combine(instructionFilepath, instruction.FileName));
                         break;
                 }
             }
@@ -286,7 +287,7 @@ namespace AutoUpdater
         private static void FetchPrerequisites(ref UpdateInstructions updateData, ref Version managerVer)
         {
             ColorWrite("\nChecking for any prerequisite versions...");
-            if (updateData.Prerequisites.Length > 0)
+            if (updateData.Prerequisites != null && updateData.Prerequisites.Length > 0)
             {
                 // Create prerequisites directory
                 ColorWriteLine($"detected {updateData.Prerequisites.Length} prerequisite versions needed!", ConsoleColor.Yellow);
@@ -306,12 +307,14 @@ namespace AutoUpdater
                             ColorWrite($"\t--Downloading required version: {prereq.Version}...", ConsoleColor.Yellow);
 
                             // Set the data for the prerequisite file package
-                            string prereqFilePath = Path.Combine(PrerequisitesDirectory, $"{prereq.Version}", ReleasePackageName);
-                            Uri prereqURL = new Uri($"{MainRepoURL}/releases/download/{prereq.Version}/{ReleasePackageName}");
+                            string prereqZip = Path.Combine(PrerequisitesDirectory, $"{prereq.Version}", ReleasePackageName);
+                            Uri prereqURL = new Uri($"{GithubRepoURL}/releases/download/{prereq.Version}/{ReleasePackageName}");
 
                             // Download the prerequisite package
-                            client.DownloadFile(prereqURL, prereqFilePath);
-                            prereqUpdatePackages.Add(new Version(prereq.Version), prereqFilePath);
+                            if (!Directory.Exists(Path.GetDirectoryName(prereqZip)))
+                                Directory.CreateDirectory(Path.GetDirectoryName(prereqZip));
+                            client.DownloadFile(prereqURL, prereqZip);
+                            prereqUpdatePackages.Add(new Version(prereq.Version), prereqZip);
 
                             ColorWriteLine("Done!", ConsoleColor.Green);
                         }
@@ -347,46 +350,54 @@ namespace AutoUpdater
 
         private static void ApplyUpdate(ref Version managerVer, PatchData LatestPatchData = null, string packageZip = null)
         {
-            // Check what kind of update we're doing
-            bool IsAutoUpdate = LatestPatchData != null;
-
-            // If this is an auto-update, download the latest AutoUpdatePackage.zip
-            if (IsAutoUpdate)
+            try
             {
-                // Create updates directory
-                if (!Directory.Exists(UpdatesDirectory))
+                // Check what kind of update we're doing
+                bool IsAutoUpdate = LatestPatchData != null;
+
+                // If this is an auto-update, download the latest AutoUpdatePackage.zip
+                if (IsAutoUpdate)
                 {
-                    ColorWrite($"Creating extraction directory \"{UpdatesDirectory}\"...");
-                    _ = Directory.CreateDirectory(UpdatesDirectory);
-                    ColorWriteLine("done!", ConsoleColor.Green);
+                    // Create updates directory
+                    if (!Directory.Exists(UpdatesDirectory))
+                    {
+                        ColorWrite($"Creating extraction directory \"{UpdatesDirectory}\"...");
+                        _ = Directory.CreateDirectory(UpdatesDirectory);
+                        ColorWriteLine("done!", ConsoleColor.Green);
+                    }
+
+                    packageZip = Path.Combine(UpdatesDirectory, ReleasePackageName);
+                    using (WebClient client = new WebClient())
+                    {
+                        client.Headers.Add("user-agent", "HaloWarsDE Mod Manager");
+                        ColorWrite("Downloading latest update package...");
+                        client.DownloadFile(LatestPatchData.FileURI, packageZip);
+                        ColorWriteLine("done!", ConsoleColor.Green);
+                    }
                 }
 
-                packageZip = Path.Combine(UpdatesDirectory, ReleasePackageName);
-                using (WebClient client = new WebClient())
-                {
-                    client.Headers.Add("user-agent", "HaloWarsDE Mod Manager");
-                    ColorWrite("Downloading latest update package...");
-                    client.DownloadFile(LatestPatchData.FileURI, packageZip);
-                    ColorWriteLine("done!", ConsoleColor.Green);
-                }
+                // Extract and parse "updates.dat"
+                UpdateInstructions updateData = ExtractUpdateData(ref packageZip);
+
+                // Check for and install prerequisites
+                if (IsAutoUpdate)
+                    FetchPrerequisites(ref updateData, ref managerVer);
+
+                // Install the current package
+                InstallPackageContents(ref updateData, packageZip);
+
+                // Clean up
+                Directory.Delete(Path.GetDirectoryName(packageZip), true);
+
+                // Restart manager if this was an auto-update
+                if (IsAutoUpdate)
+                    RestartManager();
             }
-
-            // Extract and parse "updates.dat"
-            UpdateInstructions updateData = ExtractUpdateData(ref packageZip);
-
-            // Check for and install prerequisites
-            if (IsAutoUpdate)
-                FetchPrerequisites(ref updateData, ref managerVer);
-
-            // Install the current package
-            InstallPackageContents(ref updateData, packageZip);
-
-            // Clean up
-            Directory.Delete(Path.GetDirectoryName(packageZip), true);
-
-            // Restart manager if this was an auto-update
-            if (IsAutoUpdate)
-                RestartManager();
+            catch (Exception e)
+            {
+                ColorWriteLine(e.Message, ConsoleColor.Red);
+                Console.ReadKey();
+            }
         }
         #endregion
 

@@ -58,30 +58,6 @@ namespace Globals
         }
     }
 
-    public class Logging
-    {
-        private static readonly string LogFileDir = $"{Directory.GetCurrentDirectory()}\\Data\\Logs";
-        private static readonly string CurrentLogFileName = $"AppLog [{DateTime.Now:MM-dd-yyyy HH_mm_ss}].txt";
-        private static readonly string LogFilePath = Path.Combine(LogFileDir, CurrentLogFileName);
-
-        public static void WriteLogEntry(string entry)
-        {
-            /***********************************************
-             * Writes a given entry to the current log file.
-             **********************************************/
-
-            // Create logging directory
-            if (!Directory.Exists(LogFileDir))
-                _ = Directory.CreateDirectory(LogFileDir);
-
-            // Build the textual log entry
-            string log_entry = $"[{DateTime.Now:HH:mm:ss}] {entry}\n";
-
-            // Write the log entry to the current log file.
-            File.AppendAllText(LogFilePath, log_entry);
-        }
-    }
-
     public class ProgressBarManager
     {
         public static void InitProgressBar(int min = 0, int max = 100)
@@ -178,9 +154,9 @@ namespace Globals
 
             // If ManagerData.dat exists, update the manager's version accordingly
             // before checking for updates.
-            if (File.Exists(MainWindow.ManagerDataFilePath))
+            if (File.Exists(App.Constants.ManagerDataFilePath))
             {
-                using (TextReader reader = new StringReader(File.ReadAllText(MainWindow.ManagerDataFilePath)))
+                using (TextReader reader = new StringReader(File.ReadAllText(App.Constants.ManagerDataFilePath)))
                 {
                     XmlSerializer serializer = new XmlSerializer(typeof(ManagerData));
                     ManagerData managerData = (ManagerData)serializer.Deserialize(reader);

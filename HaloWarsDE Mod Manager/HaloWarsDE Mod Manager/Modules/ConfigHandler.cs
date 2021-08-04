@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 
 // Personal
-using static Globals.Logging;
 using static Globals.Main;
 
 namespace HaloWarsDE_Mod_Manager.Modules
@@ -52,19 +51,19 @@ namespace HaloWarsDE_Mod_Manager.Modules
             // Grab result of button presses
             MessageBoxResult result = MessageBox.Show("Please select your game distribution (you can change this later).", "First Time Setup", MessageBoxButton.YesNo);
 
-            // Write new config data
+            // Write new config dataDefaultUserModsFolder
             switch (result)
             {
                 case MessageBoxResult.Yes:
-                    WriteConfigData("Steam", MainWindow.DefaultUserModsFolder, true);
+                    WriteConfigData("Steam", "DEFAULT", true);
                     break;
 
                 case MessageBoxResult.No:
-                    WriteConfigData("Microsoft Store", MainWindow.DefaultUserModsFolder, true);
+                    WriteConfigData("Microsoft Store", "DEFAULT", true);
                     break;
 
                 default:
-                    WriteConfigData("Steam", MainWindow.DefaultUserModsFolder, true);
+                    WriteConfigData("Steam", "DEFAULT", true);
                     break;
             }
 
@@ -85,12 +84,12 @@ namespace HaloWarsDE_Mod_Manager.Modules
                 UserConfig deserialized = (UserConfig)serializer.Deserialize(reader);
 
                 // Assign UserModsFolder
-                UserModsFolder = deserialized.ModsDir;
+                UserModsFolder = (deserialized.ModsDir == "DEFAULT" || !Directory.Exists(deserialized.ModsDir)) ? App.Constants.DefaultUserModsFolder : deserialized.ModsDir;
                 _ = int.TryParse(deserialized.TimeoutDelay, out TimeoutDelay);
 
                 // Refresh mod manifest and game config variables
-                MainWindow.ModManifestFile = $"{UserModsFolder}\\ModManifest.txt";
-                MainWindow.GameConfigFile_UMF = $"{UserModsFolder}\\GameConfig.dat";
+                App.Constants.ModManifestFile = $"{UserModsFolder}\\ModManifest.txt";
+                App.Constants.GameConfigFile_UMF = $"{UserModsFolder}\\GameConfig.dat";
 
                 // Set the selected game distribution from the user
                 // and set the corresponding data depending on the
@@ -100,13 +99,13 @@ namespace HaloWarsDE_Mod_Manager.Modules
                     case "Steam":
                         GameDistro = "Steam";
                         MainWindow.LaunchCommand = Launch_HWDE_Steam;
-                        MainWindow.LocalAppData_Selected = MainWindow.LocalAppData_Steam;
+                        App.Constants.LocalAppData_Selected = App.Constants.LocalAppData_Steam;
                         break;
 
                     case "Microsoft Store":
                         GameDistro = "Microsoft Store";
                         MainWindow.LaunchCommand = Launch_HWDE_MS;
-                        MainWindow.LocalAppData_Selected = MainWindow.LocalAppData_MS;
+                        App.Constants.LocalAppData_Selected = App.Constants.LocalAppData_MS;
                         break;
                 }
             }
@@ -132,10 +131,10 @@ namespace HaloWarsDE_Mod_Manager.Modules
                 serializer.Serialize(writer, config, xns);
 
             if (!newly_created)
-                MainWindow.RelocateDataFolder(MainWindow.RelocateActions.Restore);
+                App.RelocateDataFolder(App.RelocateActions.Restore);
 
             LoadConfig();
-            MainWindow.RelocateDataFolder(MainWindow.RelocateActions.Replace);
+            App.RelocateDataFolder(App.RelocateActions.Replace);
             ModScan();
         }
 
@@ -149,18 +148,18 @@ namespace HaloWarsDE_Mod_Manager.Modules
             if (File.Exists(ConfigFilePath))
             {
                 // If config file exists, load its data
-                WriteLogEntry("User configuration file found; loading data entries...");
+                Logging.WriteLogEntry("User configuration file found; loading data entries...");
                 LoadConfig();
                 return true;
             }
             else
             {
                 // If config file doesn't exist, create a new one
-                WriteLogEntry("First time setup detected. Creating default user mods folder and new configuration file...");
+                Logging.WriteLogEntry("First time setup detected. Creating default user mods folder and new configuration file...");
 
                 // Create the default user mods folder if it doesn't already exist
-                if (!Directory.Exists(MainWindow.DefaultUserModsFolder))
-                    _ = Directory.CreateDirectory(MainWindow.DefaultUserModsFolder);
+                if (!Directory.Exists(App.Constants.DefaultUserModsFolder))
+                    _ = Directory.CreateDirectory(App.Constants.DefaultUserModsFolder);
 
                 // Create the new config file
                 CreateConfig();

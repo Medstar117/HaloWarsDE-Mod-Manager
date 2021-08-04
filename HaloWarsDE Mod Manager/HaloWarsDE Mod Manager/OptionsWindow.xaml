@@ -124,11 +124,34 @@
                 <TabItem Header="About">
                     <Grid>
                         <StackPanel Orientation="Vertical" Margin="15">
-                            <Label Style="{StaticResource AboutPageLabels}" Content="Developer: Medstar, Discord: Medstar#1550"/>
-                            <Label Style="{StaticResource AboutPageLabels}" Content="ModDB: https://www.moddb.com/members/medstar"/>
-                            <Label Style="{StaticResource AboutPageLabels}" Content=""/>
+                            <Label Style="{StaticResource AboutPageLabels}">
+                                <Label.Content>
+                                    <TextBlock>
+                                        <Run Text="Developer: Medstar," />
+                                        <Hyperlink Foreground="White" NavigateUri="https://www.moddb.com/members/medstar" RequestNavigate="Hyperlink_RequestNavigate">ModDB Profile,</Hyperlink>
+                                        <Run Text="Discord: Medstar#1550"/>
+                                    </TextBlock>
+                                </Label.Content>
+                            </Label>
+                            <Label Style="{StaticResource AboutPageLabels}">
+                                <Label.Content>
+                                    <TextBlock>
+                                        <Run Text="Manager Links:" />
+                                        <Hyperlink Foreground="White" NavigateUri="https://www.moddb.com/mods/halo-wars-de-mod-manager" RequestNavigate="Hyperlink_RequestNavigate">ModDB,</Hyperlink>
+                                        <Hyperlink Foreground="White" NavigateUri="https://github.com/Medstar117/HaloWarsDE-Mod-Manager/blob/main/README.md" RequestNavigate="Hyperlink_RequestNavigate">GitHub</Hyperlink>
+                                    </TextBlock>
+                                </Label.Content>
+                            </Label>
                             <Label Style="{StaticResource AboutPageLabels}" Content="Testers: Hartzheim"/>
                             <Label Style="{StaticResource AboutPageLabels}" Content="Overlays and Graphical Aesthetics: CrimsonSoul"/>
+                            <Label Style="{StaticResource AboutPageLabels}">
+                                <Label.Content>
+                                    <TextBlock>
+                                        <Run Text="Icon:" />
+                                        <Hyperlink Foreground="White" NavigateUri="https://www.deviantart.com/blagoicons/art/HALO-Wars-Definitive-Edition-Icon-646323915" RequestNavigate="Hyperlink_RequestNavigate">Blagoicons</Hyperlink>
+                                    </TextBlock>
+                                </Label.Content>
+                            </Label>
                         </StackPanel>
                         <TextBox TextWrapping="Wrap" FontSize="12"
                              Background="Transparent" Foreground="White" BorderThickness="0"

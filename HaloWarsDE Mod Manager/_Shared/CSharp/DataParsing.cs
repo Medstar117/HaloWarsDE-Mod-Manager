@@ -260,23 +260,23 @@ namespace DataSerialization
         namespace XML
         {
             [XmlRoot("UpdateInstructions")]
-            public sealed class UpdateInstructions
+            public class UpdateInstructions
             {
-                [XmlElement("Prerequisites", IsNullable = true)]
+                [XmlArray("Prerequisites", IsNullable = true)]
                 public Prerequisite[] Prerequisites;
 
-                [XmlElement("InstructionList")]
+                [XmlArray("InstructionList")]
                 public Instruction[] InstructionList;
 
 
                 // Internal classes
-                public sealed class Prerequisite
+                public class Prerequisite
                 {
                     [XmlAttribute]
                     public string Version;
                 }
 
-                public sealed class Instruction
+                public class Instruction
                 {
                     [XmlAttribute]
                     public string Action;
@@ -289,14 +289,14 @@ namespace DataSerialization
                 }
             }
 
-            public sealed class XmlDeserializer
+            public class XmlDeserializer
             {
                 // Private variables
                 private static readonly XmlSerializer serializer = new XmlSerializer(typeof(UpdateInstructions));
 
                 public UpdateInstructions GetUpdateInstructions(string filepath)
                 {
-                    using (TextReader reader = new StringReader(filepath))
+                    using (TextReader reader = new StreamReader(filepath))
                         return (UpdateInstructions)serializer.Deserialize(reader);
                 }
             }

@@ -1,10 +1,11 @@
 # Miscellaneous
-HaloWarsDE Mod Manager/_Other Art
 HaloWarsDE Mod Manager/.vs
-HaloWarsDE Mod Manager/_Build
+HaloWarsDE Mod Manager/__Installer
+HaloWarsDE Mod Manager/__Other Art
 HaloWarsDE Mod Manager/_7zip
+HaloWarsDE Mod Manager/_Build
 HaloWarsDE Mod Manager/WebScraper
-HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/bin
+HaloWarsDE Mod Manager/MigrationBackup
 
 # UWP.ProcFetcher
 HaloWarsDE Mod Manager/UWP.ProcFetcher/bin
@@ -15,8 +16,7 @@ HaloWarsDE Mod Manager/ModManifestMaker/bin
 HaloWarsDE Mod Manager/ModManifestMaker/obj
 
 # AutoUpdater
-HaloWarsDE Mod Manager/AutoUpdater/bin
-HaloWarsDE Mod Manager/AutoUpdater/obj
+HaloWarsDE Mod Manager/AutoUpdater
 
 # Mod Manager
 HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/bin
@@ -26,4 +26,5 @@ HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/obj
 
 # File Extensions
 *.old
+*.pdn
 desktop.ini

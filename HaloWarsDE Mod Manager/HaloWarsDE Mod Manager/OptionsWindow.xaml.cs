@@ -16,10 +16,11 @@ using LibGit2Sharp;
 using Ookii.Dialogs.Wpf;
 
 // Personal
-using Globals;
-using static Globals.Main;
-using DataSerialization.Downloadable;
+//using Globals;
+//using static Globals.Main;
+using HaloWarsDE_Mod_Manager.Shared.DataSerialization.Downloadable;
 using HaloWarsDE_Mod_Manager.Modules;
+using static HaloWarsDE_Mod_Manager.Shared.Main.Constants;
 
 namespace HaloWarsDE_Mod_Manager
 {
@@ -42,7 +43,7 @@ namespace HaloWarsDE_Mod_Manager
         private readonly Uri SupportedModsXML_URL = new Uri("https://raw.githubusercontent.com/Medstar117/HaloWarsDE-Mod-Manager/data_tracker/supported_mods.xml");
         private readonly string SupportedModsJSON_FILE = $"{Directory.GetCurrentDirectory()}\\Data\\supported_mods.xml";
 
-        public static ObservableCollection<Mod> DownloadableModList { get; } = new ObservableCollection<Mod>();
+        public static ObservableCollection<ModDownload> DownloadableModList { get; } = new ObservableCollection<ModDownload>();
 
 
         public OptionsWindow()
@@ -53,10 +54,10 @@ namespace HaloWarsDE_Mod_Manager
             InitializeComponent();
 
             // Display currently-set global data
-            DistroComboBox.SelectedValue = GameDistro;
-            FilePathTextBox.Text = UserModsFolder;
-            TimeoutDelay_IntUpDwn.Value = TimeoutDelay;
-            ModManagerVerLabel.Content = $"Mod Manager Version: {ManagerVer}";
+            DistroComboBox.SelectedValue = App.GameDistro;
+            FilePathTextBox.Text = App.UserModsFolder;
+            TimeoutDelay_IntUpDwn.Value = App.TimeoutDelay;
+            ModManagerVerLabel.Content = $"Version: {ManagerVer}";
             //AddModsToList();
         }
 
@@ -76,7 +77,7 @@ namespace HaloWarsDE_Mod_Manager
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
-
+        /*
         private void AddModsToList()
         {
             if (DownloadableModList.Count == 0)
@@ -99,7 +100,7 @@ namespace HaloWarsDE_Mod_Manager
                             foreach (ModEntry downloadable_mod in supported.Mods)
                             {
                                 bool isInstalled = false;
-                                foreach (DataSerialization.Mod installed_mod in MainWindow.ModList)
+                                foreach (Shared.DataSerialization.Mods.ModObj installed_mod in App.ModList)
                                 {
                                     if (installed_mod.ModID == downloadable_mod.ModID)
                                     {
@@ -119,13 +120,13 @@ namespace HaloWarsDE_Mod_Manager
                 }
                 catch (Exception e)
                 {
-                    _ = MessageBox.Show("Error" + e);
+                    MessageBox.Show("Error" + e);
                 }
             }
 
             ListBox_DownloadableModsList.SelectedIndex = 0;
         }
-
+        */
 
         #region Settings Functions
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -139,49 +140,50 @@ namespace HaloWarsDE_Mod_Manager
         {
             // Ignore the first change since its called to set the data on initialization
             if (FirstChange)
-                DistroModified = DistroComboBox.SelectedValue.ToString() != GameDistro;
+                DistroModified = DistroComboBox.SelectedValue.ToString() != App.GameDistro;
             else
                 FirstChange = true;
         }
 
         private void TimeoutDelay_IntUpDwn_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (TimeoutDelay_IntUpDwn.Value != TimeoutDelay && TimeoutDelay_IntUpDwn.Value != null)
+            if ((TimeoutDelay_IntUpDwn.Value != App.TimeoutDelay) && (TimeoutDelay_IntUpDwn.Value != null))
             {
                 TimeoutDelayModified = true;
-                TimeoutDelay = (int)TimeoutDelay_IntUpDwn.Value;
+                App.TimeoutDelay = (int)TimeoutDelay_IntUpDwn.Value;
             }
         }
-
         private void Prompt_ModFolderBrowser(object sender, RoutedEventArgs e)
         {
             // Set up new folder browser dialog box
             VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog
             {
-                SelectedPath = UserModsFolder,
+                SelectedPath = App.UserModsFolder,
                 Description = "Please Select Your Mods Folder",
                 UseDescriptionForTitle = true
             };
 
+            if (dialog.ShowDialog() == true)
+                FilePathTextBox.Text = dialog.SelectedPath;
             // Show the File Explorer window and protect GameConfig.dat from being deleted accidentally
-            using (FileStream protectGameConfig = new FileStream(App.Constants.GameConfigFile_UMF, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                // If the dialog box is showing, set the text box to be the selected path
-                if (dialog.ShowDialog() == true)
-                    FilePathTextBox.Text = dialog.SelectedPath;
+            //using (FileStream protectGameConfig = new FileStream(App.GameConfigFile_UMF, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            //{
+            //    // If the dialog box is showing, set the text box to be the selected path
+            //    if (dialog.ShowDialog() == true)
+            //        FilePathTextBox.Text = dialog.SelectedPath;
 
-                protectGameConfig.Close();
-            }
+            //    protectGameConfig.Close();
+            //}
 
             // Set DataModified flag
-            ModPathModified = FilePathTextBox.Text != UserModsFolder;
+            ModPathModified = FilePathTextBox.Text != App.UserModsFolder;
         }
         #endregion
 
         #region Downloader Functions
         private void Button_DownloadMod_Click(object sender, RoutedEventArgs e)
         {
-            Mod SelectedMod = ListBox_DownloadableModsList.SelectedItem as Mod;
+            ModDownload SelectedMod = ListBox_DownloadableModsList.SelectedItem as ModDownload;
             Uri downloadableURL = new Uri(SelectedMod.DownloadURL);
 
             Task DownloadMod = new Task(() =>
@@ -193,24 +195,24 @@ namespace HaloWarsDE_Mod_Manager
                     switch (client.IsURLValid(downloadableURL))
                     {
                         case UrlTestClient.SupportedHostnames.Unsupported:
-                            _ = MessageBox.Show("An unsupported hostname is detected in this mod's 'DownloadURL' element.\n\n" +
+                            MessageBox.Show("An unsupported hostname is detected in this mod's 'DownloadURL' element.\n\n" +
                                 "This mod cannot be downloaded at this time, as this manager doesn't know how to download it (yet).",
                                 "Download Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             Dispatcher.Invoke(() => { Button_DownloadMod2.IsEnabled = true; });
                             break;
 
                         case UrlTestClient.SupportedHostnames.ModDB:
-                            _ = MessageBox.Show("Valid: ModDB");
+                            MessageBox.Show("Valid: ModDB");
                             Dispatcher.Invoke(() => { Button_DownloadMod2.IsEnabled = true; });
                             break;
 
                         case UrlTestClient.SupportedHostnames.GitHub:
-                            _ = MessageBox.Show("Valid: GitHub");
+                            MessageBox.Show("Valid: GitHub");
                             Dispatcher.Invoke(() => { Button_DownloadMod2.IsEnabled = true; });
                             break;
 
                         default:
-                            _ = MessageBox.Show("An invalid/inaccessible URL has been provided for this mod.\n\n" +
+                            MessageBox.Show("An invalid/inaccessible URL has been provided for this mod.\n\n" +
                                 "Please make sure the provided 'DownloadURL' section includes a supported hostname and/or an accessible download page.",
                                 "Download Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             Dispatcher.Invoke(() => { Button_DownloadMod2.IsEnabled = true; });
@@ -361,7 +363,6 @@ namespace HaloWarsDE_Mod_Manager
             }
         }
         #endregion
-
     }
 
     #region Custom Classes

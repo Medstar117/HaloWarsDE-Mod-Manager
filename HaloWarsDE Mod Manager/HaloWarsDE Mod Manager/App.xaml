@@ -1,9 +1,94 @@
-﻿<Application x:Class="HaloWarsDE_Mod_Manager.App"
+<Application x:Class="HaloWarsDE_Mod_Manager.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:local="clr-namespace:HaloWarsDE_Mod_Manager.Modules.Xaml"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:HaloWarsDE_Mod_Manager"
-             StartupUri="MainWindow.xaml">
-    <Application.Resources>
-        
-    </Application.Resources>
+             Startup="OnStartUp">
+  <!--StartupUri="MainWindow.xaml">-->
+  <Application.Resources>
+    <ResourceDictionary>
+      <!--#region External Merged Resources (Mostly Nuget)-->
+      <ResourceDictionary.MergedDictionaries>
+      </ResourceDictionary.MergedDictionaries>
+      <!--#endregion-->
+      <!--#region Colors and Brushes-->
+      <Color x:Key="Forerunner.Cyan" R="#AA" G="#FF" B="#FF" A="#FF" />
+      <SolidColorBrush x:Key="Forerunner.Cyan.Brush" Color="{StaticResource Forerunner.Cyan}" />
+      <ImageBrush Stretch="Fill" x:Key="MainButton.Background.Static" ImageSource="pack://application:,,,/Assets/Buttons/Main/MainButton.Static.png" />
+      <ImageBrush Stretch="Fill" x:Key="MainButton.Background.MouseOver" ImageSource="pack://application:,,,/Assets/Buttons/Main/MainButton.MouseOver.png" />
+      <ImageBrush Stretch="Fill" x:Key="MainButton.Background.Pressed" ImageSource="pack://application:,,,/Assets/Buttons/Main/MainButton.Pressed.png" />
+      <ImageBrush Stretch="Fill" x:Key="MainButton.Background.Disabled" ImageSource="pack://application:,,,/Assets/Buttons/Main/MainButton.Disabled.png" />
+      <ImageBrush Stretch="Fill" x:Key="Button.Exit.Background.Static" ImageSource="pack://application:,,,/Assets/Buttons/Exit/Exit.Static.png" />
+      <ImageBrush Stretch="Fill" x:Key="Button.Exit.Background.MouseOver" ImageSource="pack://application:,,,/Assets/Buttons/Exit/Exit.MouseOver.png" />
+      <ImageBrush Stretch="Fill" x:Key="Button.Exit.Background.Pressed" ImageSource="pack://application:,,,/Assets/Buttons/Exit/Exit.Pressed.png" />
+      <ImageBrush Stretch="Fill" x:Key="Button.Minimize.Background.Static" ImageSource="pack://application:,,,/Assets/Buttons/Minimize/Minimize.Static.png" />
+      <ImageBrush Stretch="Fill" x:Key="Button.Minimize.Background.MouseOver" ImageSource="pack://application:,,,/Assets/Buttons/Minimize/Minimize.MouseOver.png" />
+      <ImageBrush Stretch="Fill" x:Key="Button.Minimize.Background.Pressed" ImageSource="pack://application:,,,/Assets/Buttons/Minimize/Minimize.Pressed.png" />
+      <!--#endregion-->
+      <!--#region DataTemplates-->
+      <DataTemplate x:Key="MStyle.MainButton.AutoTextResize">
+        <Viewbox Width="72" Height="22">
+          <TextBlock Text="{Binding}" FontSize="18" FontFamily="Arial Rounded MT Bold" />
+        </Viewbox>
+      </DataTemplate>
+      <!--#endregion-->
+      <!--#region Styles-->
+      <Style x:Key="MStyle.GeneralButtonProperties" TargetType="Button">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+      </Style>
+      <Style x:Key="MStyle.TinyCustomButtons" TargetType="Button" BasedOn="{StaticResource MStyle.GeneralButtonProperties}">
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="Button">
+              <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+              </Border>
+              <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                  <Setter Property="Background" TargetName="border" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:ButtonEx.MouseOverBackground)}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                  <Setter Property="Background" TargetName="border" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:ButtonEx.IsPressedBackground)}" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+      <Style x:Key="MStyle.MainButton" TargetType="{x:Type Button}" BasedOn="{StaticResource MStyle.GeneralButtonProperties}">
+        <Setter Property="Width" Value="112" />
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Margin" Value="50,0" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource Forerunner.Cyan.Brush}" />
+        <Setter Property="Background" Value="{StaticResource MainButton.Background.Static}" />
+        <Setter Property="ContentTemplate" Value="{StaticResource MStyle.MainButton.AutoTextResize}" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type Button}">
+              <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+              </Border>
+              <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                  <Setter Property="Background" TargetName="border" Value="{StaticResource MainButton.Background.MouseOver}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                  <Setter Property="Background" TargetName="border" Value="{StaticResource MainButton.Background.Pressed}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                  <Setter Property="Background" TargetName="border" Value="{StaticResource MainButton.Background.Disabled}" />
+                  <Setter Property="Foreground" Value="LightGray" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+      <!--#endregion-->
+    </ResourceDictionary>
+  </Application.Resources>
 </Application>

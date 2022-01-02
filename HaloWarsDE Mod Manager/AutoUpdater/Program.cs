@@ -362,7 +362,7 @@ namespace AutoUpdater
                     if (!Directory.Exists(UpdatesDirectory))
                     {
                         ColorWrite($"Creating extraction directory \"{UpdatesDirectory}\"...");
-                        _ = Directory.CreateDirectory(UpdatesDirectory);
+                        Directory.CreateDirectory(UpdatesDirectory);
                         ColorWriteLine("done!", ConsoleColor.Green);
                     }
 

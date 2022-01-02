@@ -9,8 +9,7 @@ using System.Windows.Controls;
 using Ookii.Dialogs.Wpf;
 
 // Personal
-using DataSerialization.Serializable;
-using static DataSerialization.Serializable.ManifestSerializer;
+using HaloWarsDE_Mod_Manager.Shared.DataSerialization.Mods;
 
 
 namespace ModManifestMaker
@@ -50,11 +49,9 @@ namespace ModManifestMaker
             if (dialog.ShowDialog() == true)
             {
                 if (dialog.FileName.Contains(HWMOD_Location))
-                {
                     textbox.Text = dialog.FileName.Replace(HWMOD_Location + "\\", string.Empty);
-                }
                 else
-                    _ = MessageBox.Show($"File must be in a relative directory to the following path:\n\n{HWMOD_Location}", "Relative Path Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"File must be in a relative directory to the following path:\n\n{HWMOD_Location}", "Relative Path Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -106,10 +103,16 @@ namespace ModManifestMaker
 
         private void RequiredData_TextChanged(object sender, TextChangedEventArgs e)
         {
-            SaveButton.IsEnabled = (ModName_TextBox.Text != "") && (ModAuthor_TextBox.Text != "") && (ModFolder_TextBox.Text != "") && (ModVersion_TextBox.Text != "") && Directory.Exists(ModFolder_TextBox.Text + "\\");
-            Banner_TextBox.IsEnabled = Banner_Button.IsEnabled = Icon_Button.IsEnabled = Icon_TextBox.IsEnabled = (ModFolder_TextBox.Text != "" && Directory.Exists(ModFolder_TextBox.Text + "\\"));
-            Banner_Button.ToolTip = Icon_Button.ToolTip = (ModFolder_TextBox.Text != "" && Directory.Exists(ModFolder_TextBox.Text + "\\")) ? null : "Your mod's base directory must be a valid directory on your filesystem!";
+            // Boolean checks
+            bool ModFolderOK = ModFolder_TextBox.Text != "" && Directory.Exists(ModFolder_TextBox.Text + "\\");
+            bool SaveOK = (ModName_TextBox.Text != "") && (ModAuthor_TextBox.Text != "") && ModFolderOK && (ModVersion_TextBox.Text != "");
 
+            // GUI modification based on boolean checks
+            SaveButton.IsEnabled = SaveOK;
+            Banner_TextBox.IsEnabled = Banner_Button.IsEnabled = Icon_Button.IsEnabled = Icon_TextBox.IsEnabled = ModFolderOK;
+            Banner_Button.ToolTip = Icon_Button.ToolTip = ModFolderOK ? null : "Your mod's base directory must be a valid directory on your filesystem!";
+
+            // Check if anything has been modified
             RequiredDataModified = !temp_Data.Contains(ModName_TextBox.Text) ||
                                    !temp_Data.Contains(ModAuthor_TextBox.Text) ||
                                    !temp_Data.Contains(ModVersion_TextBox.Text) ||
@@ -129,7 +132,7 @@ namespace ModManifestMaker
             if (mod_manifest.ShowDialog() == true)
             {
                 // Deserialize the manifest file into a usable object
-                ModManifest deserialized = DeserializeManifest(mod_manifest.FileName);
+                ModManifest deserialized = ManifestSerializer.DeserializeManifest(mod_manifest.FileName);
 
                 // Yes, yes, this is a one case switch; this is mainly for future-proofing in case changes are made down the road
                 switch (deserialized.ManifestVersion)
@@ -168,17 +171,17 @@ namespace ModManifestMaker
                     if (result == MessageBoxResult.Yes)
                     {
                         File.Delete(hwmod_file);
-                        SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, RequiredDataModified ? null : ModID);
+                        ManifestSerializer.SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, RequiredDataModified ? null : ModID);
                     }
                 }
                 else
-                    SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, RequiredDataModified ? null : ModID);
+                    ManifestSerializer.SerializeManifest(hwmod_file, ModName_TextBox.Text, ModAuthor_TextBox.Text, ModVersion_TextBox.Text, Banner_TextBox.Text, Icon_TextBox.Text, Desc_TextBox.Text, RequiredDataModified ? null : ModID);
 
-                _ = MessageBox.Show("Mod manifest saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Mod manifest saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception error)
             {
-                _ = MessageBox.Show($"{error.Message}\n\n\n{error.StackTrace}", "Exception Caught", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{error.Message}\n\n\n{error.StackTrace}", "Exception Caught", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         #endregion

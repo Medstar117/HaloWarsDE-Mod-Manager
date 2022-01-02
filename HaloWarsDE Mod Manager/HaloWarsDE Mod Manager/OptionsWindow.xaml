@@ -101,6 +101,7 @@
                             <StackPanel DockPanel.Dock="Left">
                                 <Label Style="{StaticResource AboutPageLabels}" Content="Distribution:"/>
                                 <Label Style="{StaticResource AboutPageLabels}" Content="Launch Timeout Delay (in seconds):"/>
+                                <!--<Label Style="{StaticResource AboutPageLabels}" Content="Always make Desktop shortcut on startup:" />-->
                                 <Label Style="{StaticResource AboutPageLabels}" Content="User Mods Directory:"/>
                             </StackPanel>
 
@@ -112,6 +113,7 @@
                                 </ComboBox>
                                 <wpfx:IntegerUpDown Style="{StaticResource UniversalRightAligned}" x:Name="TimeoutDelay_IntUpDwn"
                                                     Minimum="0" Maximum="100" ValueChanged="TimeoutDelay_IntUpDwn_ValueChanged"/>
+                                <!--<CheckBox Style="{StaticResource UniversalRightAligned}" x:Name="CheckBox_DesktopShortcut" Click="CheckBox_DesktopShortcut_Click"/>-->
                                 <Button Style="{StaticResource UniversalRightAligned}" Content="Change Directory" Click="Prompt_ModFolderBrowser"/>
                             </StackPanel>
                         </DockPanel>
@@ -239,15 +241,9 @@
         </DockPanel>
 
         <!-- Version Data -->
-        <Label x:Name="ModManagerVerLabel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="150" Height="25" Margin="0,0,10,10">
-            <Label.ContentTemplate>
-                <DataTemplate>
-                    <Viewbox VerticalAlignment="Top" HorizontalAlignment="Center">
-                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Text="{Binding}" FontSize="26" Foreground="White"/>
-                    </Viewbox>
-                </DataTemplate>
-            </Label.ContentTemplate>
-        </Label>
+        <Label x:Name="ModManagerVerLabel"
+               HorizontalContentAlignment="Right" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+               Width="150" Height="25" Margin="0,0,10,10" Foreground="White" FontSize="14"/>
 
     </Grid>
 </Window>

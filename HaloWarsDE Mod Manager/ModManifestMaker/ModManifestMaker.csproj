@@ -221,8 +221,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="..\_Shared\CSharp\DataParsing.cs">
-      <Link>Shared\DataParsing.cs</Link>
+    <Compile Include="..\_Shared\CSharp\DataSerialization.cs">
+      <Link>Shared\DataSerialization.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

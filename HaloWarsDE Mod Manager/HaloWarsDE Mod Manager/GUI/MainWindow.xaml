@@ -1,0 +1,239 @@
+﻿<Window x:Class="HaloWarsDE_Mod_Manager.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ext="clr-namespace:HaloWarsDE_Mod_Manager.Core.Xaml"
+        mc:Ignorable="d" WindowStyle="None" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" AllowsTransparency="True"
+        Title="HaloWarsDE Mod Manager" Width="960" Height="480"
+        OpacityMask="{DynamicResource MainWindow.OpacityMask}"
+        Background ="{DynamicResource MainWindow.Background}"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    <Window.Resources>
+
+        <!--#region Brushes -->
+        <!-- Custom Colors -->
+        <Color x:Key="Colors.ForerunnerCyan" R="#AA" G="#FF" B="#FF" A="#FF"/>
+        <SolidColorBrush x:Key="Brushes.ForerunnerCyan" Color="{DynamicResource Colors.ForerunnerCyan}"/>
+
+        <!-- Layout Stuff -->
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.OpacityMask"          ImageSource="pack://application:,,,/Resources/Layout/MainWindow/OpacityMask.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.Background"           ImageSource="pack://application:,,,/Resources/Layout/MainWindow/StillBackground.jpg"/>
+        <ImageBrush Stretch="Fill" x:Key="ModListBox.Background"           ImageSource="pack://application:,,,/Resources/Layout/MainWindow/ModListBox.png"/>
+        <ImageBrush Stretch="Fill" x:Key="DescriptionBox.Background"       ImageSource="pack://application:,,,/Resources/Layout/MainWindow/DescriptionBox.png"/>
+
+        <!-- Exit Button -->
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.ExitButton"           ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/Exit.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.ExitButton.MouseOver" ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/Exit_MouseOver.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.ExitButton.Pressed"   ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/Exit_Pressed.png"/>
+
+        <!-- Minimize Button -->
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.MinimizeButton"           ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/Minimize.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.MinimizeButton.MouseOver" ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/Minimize_MouseOver.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.MinimizeButton.Pressed"   ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/Minimize_Pressed.png"/>
+
+        <!-- Big Button -->
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.BigButton"           ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/BigButton.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.BigButton.MouseOver" ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/BigButton_MouseOver.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.BigButton.Pressed"   ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/BigButton_Pressed.png"/>
+        <ImageBrush Stretch="Fill" x:Key="MainWindow.BigButton.Disabled"  ImageSource="pack://application:,,,/Resources/Layout/MainWindow/Buttons/BigButton_Disabled.png"/>
+
+        <!-- What Holds the Background Video -->
+        <VisualBrush x:Key="Background.Animated" Stretch="Fill">
+            <VisualBrush.Visual>
+                <MediaElement Stretch="UniformToFill" LoadedBehavior="Manual"/>
+            </VisualBrush.Visual>
+        </VisualBrush>
+        <!--#endregion-->
+
+        <!-- Data Templates -->
+        <DataTemplate x:Key="MainWindow.BigButton.AutoTextResize">
+            <Viewbox Width="72" Height="22">
+                <TextBlock Text="{Binding}" FontSize="18" FontFamily="Arial Rounded MT Bold"/>
+            </Viewbox>
+        </DataTemplate>
+
+        <!-- Styles -->
+        <Style x:Key="MainWindow.SmallButtons" TargetType="Button">
+            <Setter Property="BorderThickness"            Value="0"   />
+            <Setter Property="VerticalAlignment"          Value="Top" />
+            <Setter Property="Width"                      Value="25"  />
+            <Setter Property="Height"                     Value="24"  />
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" SnapsToDevicePixels="true"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}"
+                                              RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="border"
+                                        Value="{Binding RelativeSource={RelativeSource TemplatedParent},
+                                                        Path=(ext:ButtonEx.IsMouseOverBackground)}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" TargetName="border"
+                                        Value="{Binding RelativeSource={RelativeSource TemplatedParent},
+                                                        Path=(ext:ButtonEx.IsPressedBackground)}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MainWindow.MainButtons" TargetType="Button">
+            <Setter Property="BorderThickness"     Value="0"/>
+            <Setter Property="VerticalAlignment"   Value="Top"/>
+            <Setter Property="Width"               Value="112"/>
+            <Setter Property="Height"              Value="44"/>
+            <Setter Property="Margin"              Value="50, 0, 0, 0"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Foreground"          Value="{DynamicResource Brushes.ForerunnerCyan}"/>
+            <Setter Property="Background"          Value="{DynamicResource MainWindow.BigButton}"/>
+            <Setter Property="ContentTemplate"     Value="{DynamicResource MainWindow.BigButton.AutoTextResize}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" Margin="{TemplateBinding Padding}"
+                                              RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="{DynamicResource MainWindow.BigButton.MouseOver}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="{DynamicResource MainWindow.BigButton.Pressed}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" TargetName="border" Value="{DynamicResource MainWindow.BigButton.Disabled}"/>
+                                <Setter Property="Foreground" Value="LightGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MainWindow.RoundedEdgeProgressBar" TargetType="ProgressBar">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background"      Value="DimGray"/>
+            <Setter Property="Visibility"      Value="Hidden"/>
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <LinearGradientBrush>
+                        <GradientStop Color="{DynamicResource Colors.ForerunnerCyan}" Offset="0.825"/>
+                        <GradientStop Color="White" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid x:Name="TemplateRoot">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}" CornerRadius="5"/>
+                            <Rectangle x:Name="PART_Track"/>
+                            <Grid x:Name="PART_Indicator" ClipToBounds="True" HorizontalAlignment="Left">
+                                <Rectangle x:Name="Indicator" Fill="{TemplateBinding Foreground}" RadiusX="5" RadiusY="5"/>
+                                <Rectangle x:Name="Animation" Fill="{TemplateBinding Foreground}" RadiusX="5" RadiusY="5" RenderTransformOrigin="0.5, 0.5">
+                                    <Rectangle.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform/>
+                                            <SkewTransform/>
+                                            <RotateTransform/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </Rectangle.RenderTransform>
+                                </Rectangle>
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- CONTENT ROOT -->
+    <Grid Background="{DynamicResource Background.Animated}" >
+        <!-- Main GUI Layout and Background-->
+        <Image Source="pack://application:,,,/Resources/Layout/MainWindow/Overlay.png" Stretch="Fill"/>
+
+        <!-- Mod Browsing -->
+        <Image x:Name="ModBannerArt" Stretch="UniformToFill"
+               VerticalAlignment="Top" HorizontalAlignment="Right"
+               Width="480" Height="90" Margin="0, 138, 38, 0"
+               Source="pack://application:,,,/Resources/Layout/DefaultBannerArt.png"/>
+        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left"
+                   Width="480" Height="114" Margin="442, 233, 0, 0"
+                   Background="{DynamicResource DescriptionBox.Background}">
+            <TextBox x:Name="DescriptionTextBox" IsReadOnly="True"
+                     TextWrapping="Wrap" FontFamily="Arial" FontSize="12"
+                     Width="448" Height="90" Margin="12, 14, 0, 0"
+                     Foreground="LightGray" Background="Transparent"
+                     BorderThickness="0"/>
+        </TextBlock>
+        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left"
+                   Width="361" Height="212" Margin="59, 135, 0, 0"
+                   Background="{DynamicResource ModListBox.Background}">
+            <ListBox x:Name="ModListBox" ItemsSource="{Binding}"
+                     Width="355" Height="192" Margin="3, 12"
+                     Background="Transparent" BorderThickness="0"
+                     SelectionChanged="ModListBox_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel LastChildFill="False">
+                            <TextBlock Foreground="LightGray" Width="173" TextWrapping="NoWrap" Text="{Binding Title}" DockPanel.Dock="Left"/>
+                            <TextBlock Foreground="LightGray" Width="170" TextWrapping="NoWrap" Text="{Binding Version}" DockPanel.Dock="Right" TextAlignment="Right"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </TextBlock>
+
+        <!-- Minimize and Exit Buttons-->
+        <ext:ButtonEx x:Name="MinimizeButton" Margin="890,32,45,0"
+                Style="{DynamicResource MainWindow.SmallButtons}"
+                Background="{DynamicResource MainWindow.MinimizeButton}"
+                ext:IsMouseOverBackground= "{DynamicResource MainWindow.MinimizeButton.MouseOver}"
+                ext:IsPressedBackground  = "{DynamicResource MainWindow.MinimizeButton.Pressed}"
+                Click="MinimizeButton_Click"/>
+        <ext:ButtonEx x:Name="ExitButton" Margin="920,32,15,0"
+                Style="{DynamicResource MainWindow.SmallButtons}"
+                Background="{DynamicResource MainWindow.ExitButton}"
+                ext:IsMouseOverBackground= "{DynamicResource MainWindow.ExitButton.MouseOver}"
+                ext:IsPressedBackground  = "{DynamicResource MainWindow.ExitButton.Pressed}"
+                Click="ExitButton_Click"/>
+
+        <!-- Bottom Buttons -->
+        <Grid Margin="112, 395, 112, 0">
+            <StackPanel Height="44" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" Width="Auto">
+                <Button Style="{DynamicResource MainWindow.MainButtons}" Content="OPTIONS"   x:Name="OptionsButton"        Click="OptionsButton_Click"/>
+                <Button Style="{DynamicResource MainWindow.MainButtons}" Content="MY MODS"   x:Name="ModFolderButton"      Click="ModFolderButton_Click"/>
+                <Button Style="{DynamicResource MainWindow.MainButtons}" Content="MAKE LINK" x:Name="CreateShortcutButton" Click="CreateShortcutButton_Click"/>
+                <Button Style="{DynamicResource MainWindow.MainButtons}" Content="PLAY"      x:Name="PlayButton"           Click="PlayButton_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Progress Bar -->
+        <Label x:Name="pBarLabel" x:FieldModifier="public"
+               BorderThickness="0" ClipToBounds="True"
+               VerticalAlignment="Top" HorizontalAlignment="Center"
+               Width="470" Height="18" Margin="0,440,0,0"
+               FontSize="12" Padding="0" Visibility="Hidden"
+               Foreground="{DynamicResource Brushes.ForerunnerCyan}"/>
+        <ProgressBar x:Name="pBar" x:FieldModifier="public"
+               VerticalAlignment="Top" HorizontalAlignment="Left"
+               Width="470" Height="10" Margin="244, 460, 0, 0"
+               Style="{DynamicResource MainWindow.RoundedEdgeProgressBar}"/>
+    </Grid>
+</Window>

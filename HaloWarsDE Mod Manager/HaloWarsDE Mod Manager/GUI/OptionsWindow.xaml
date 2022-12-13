@@ -1,0 +1,145 @@
+﻿<Window x:Class="HaloWarsDE_Mod_Manager.GUI.OptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:upd="clr-namespace:ag.WPF.UpDown;assembly=ag.WPF.UpDown"
+        mc:Ignorable="d" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        Title="Mod Manager Options" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen" Closing="Window_Closing"
+        Background="{DynamicResource OptionsWindow.Background}">
+    <Window.Resources>
+        
+        <!--#region Brushes-->
+        <ImageBrush Stretch="Fill" x:Key="OptionsWindow.Background"           ImageSource="pack://application:,,,/Resources/Layout/OptionsWindow/StillBackground.jpg"/>
+
+        <!-- What Holds the Background Video -->
+        <VisualBrush x:Key="Background.Animated" Stretch="Fill">
+            <VisualBrush.Visual>
+                <MediaElement Stretch="UniformToFill" LoadedBehavior="Manual"/>
+            </VisualBrush.Visual>
+        </VisualBrush>
+        <!--#endregion-->
+        
+        <!--#region Styles-->
+        <Style x:Key="OptionButton" TargetType="Button">
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="DockPanel.Dock" Value="Top"/>
+            <Setter Property="Margin" Value="0,2,0,8"/>
+        </Style>
+
+        <Style x:Key="AboutPageLabels" TargetType="Label">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="0,0,5,5"/>
+        </Style>
+
+        <Style x:Key="UniversalRightAligned" TargetType="Control">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Width" Value="130"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <!--#endregion-->
+    </Window.Resources>
+    <Grid Background="{DynamicResource Background.Animated}">
+        <DockPanel Margin="10">
+            <!-- Side Buttons -->
+            <StackPanel x:Name="ButtonList" DockPanel.Dock="Left" Orientation="Vertical" Margin="0,0,15,0" Width="160">
+                <Button Style="{DynamicResource OptionButton}" Content="Settings"/>
+                <Button Style="{DynamicResource OptionButton}" Content="About"/>
+            </StackPanel>
+            
+            <!-- Right Side Content -->
+            <TabControl DockPanel.Dock="Right" x:Name="TabbedDisplay" Background="Transparent"
+                        ItemContainerStyle="{DynamicResource HiddenHeaders}">
+                <TabControl.Resources>
+                    <Style x:Key="HiddenHeaders" TargetType="TabItem">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Style>
+                </TabControl.Resources>
+                <TabItem Header="Settings">
+                    <StackPanel Orientation="Vertical" Margin="15">
+                        <DockPanel>
+                            <!-- Left side content -->
+                            <StackPanel DockPanel.Dock="Left">
+                                <Label Style="{DynamicResource AboutPageLabels}" Content="Installation Type: "/>
+                                <Label Style="{DynamicResource AboutPageLabels}" Content="Launch Timeout Delay (in seconds): "/>
+                                <Label Style="{DynamicResource AboutPageLabels}" Content="User Mods Directory: "/>
+                            </StackPanel>
+
+                            <!-- Right side content -->
+                            <StackPanel DockPanel.Dock="Right">
+                                <ComboBox Style="{DynamicResource UniversalRightAligned}" x:Name="DistroComboBox" SelectedValuePath="Content"
+                                          SelectionChanged="DistroComboBox_SelectionChanged">
+                                    <ComboBoxItem FontSize="14" Content="Steam"/>
+                                    <ComboBoxItem FontSize="14" Content="Microsoft Store"/>
+                                </ComboBox>
+                                <upd:UpDown Style="{DynamicResource UniversalRightAligned}" x:Name="TimeoutDelayIntUpDown"
+                                            MinValue="0" ValueChanged="TimeoutDelayIntUpDown_ValueChanged"/>
+                                <Button Style="{DynamicResource UniversalRightAligned}" Content="Change Mod Folder" Click="OpenModFolderBrowser"/>
+                            </StackPanel>
+                        </DockPanel>
+
+                        <!-- Bottom Center Content-->
+                        <TextBox x:Name="FilePathTextBox" FontSize="14" Width="Auto" Height="25" VerticalAlignment="Center" IsReadOnly="True"/>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="About">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Vertical"
+                                    Margin="15" Background="Transparent">
+                            <Label Style="{StaticResource AboutPageLabels}">
+                                <Label.Content>
+                                    <TextBlock>
+                                        <Run Text="Developer: Medstar," />
+                                        <Hyperlink Foreground="White" NavigateUri="https://www.moddb.com/members/medstar" RequestNavigate="Hyperlink_RequestNavigate">ModDB Profile,</Hyperlink>
+                                        <Run Text="Discord: Medstar#1550"/>
+                                    </TextBlock>
+                                </Label.Content>
+                            </Label>
+                            <Label Style="{StaticResource AboutPageLabels}">
+                                <Label.Content>
+                                    <TextBlock>
+                                        <Run Text="Manager Links:" />
+                                        <Hyperlink Foreground="White" NavigateUri="https://www.moddb.com/mods/halo-wars-de-mod-manager" RequestNavigate="Hyperlink_RequestNavigate">ModDB,</Hyperlink>
+                                        <Hyperlink Foreground="White" NavigateUri="https://github.com/Medstar117/HaloWarsDE-Mod-Manager/blob/main/README.md" RequestNavigate="Hyperlink_RequestNavigate">GitHub</Hyperlink>
+                                    </TextBlock>
+                                </Label.Content>
+                            </Label>
+                            <Label Style="{StaticResource AboutPageLabels}" Content="Testers: Hartzheim"/>
+                            <Label Style="{StaticResource AboutPageLabels}" Content="Overlays and Graphical Aesthetics: CrimsonSoul"/>
+                            <Label Style="{StaticResource AboutPageLabels}">
+                                <Label.Content>
+                                    <TextBlock>
+                                        <Run Text="Icon:" />
+                                        <Hyperlink Foreground="White" NavigateUri="https://www.deviantart.com/blagoicons/art/HALO-Wars-Definitive-Edition-Icon-646323915" RequestNavigate="Hyperlink_RequestNavigate">Blagoicons</Hyperlink>
+                                    </TextBlock>
+                                </Label.Content>
+                            </Label>
+                        </StackPanel>
+                        <TextBox DockPanel.Dock="Bottom" TextWrapping="Wrap"
+                                 Background="Transparent" Foreground="White" FontSize="12"
+                                 VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                 TextAlignment="Center" Margin="0,40" BorderThickness="0"
+                                 Text="Halo Wars: Definitive Edition © Microsoft Corporation. The 'HaloWarsDE Mod Manager' was created under Microsoft's 'Game Content Usage Rules' using assets from Halo Wars: Definitive Edition, and it is not endorsed by or affiliated with Microsoft."/>
+                    </DockPanel>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+
+        <!-- Version Data -->
+        <Label x:Name="VersionLabel" Width="150" Height="25" Margin="0,0,10,10"
+               HorizontalContentAlignment="Right" VerticalAlignment="Bottom"
+               HorizontalAlignment="Right" Foreground="White" FontSize="14"/>
+    </Grid>
+</Window>

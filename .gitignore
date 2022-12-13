@@ -1,22 +1,15 @@
 # Miscellaneous
+_OLD
 HaloWarsDE Mod Manager/.vs
-HaloWarsDE Mod Manager/__Installer
-HaloWarsDE Mod Manager/__Other Art
-HaloWarsDE Mod Manager/_7zip
-HaloWarsDE Mod Manager/_Build
-HaloWarsDE Mod Manager/WebScraper
-HaloWarsDE Mod Manager/MigrationBackup
-
-# UWP.ProcFetcher
-HaloWarsDE Mod Manager/UWP.ProcFetcher/bin
-HaloWarsDE Mod Manager/UWP.ProcFetcher/obj
+HaloWarsDE Mod Manager/_LatestBuild
 
 # ModManifestMaker
-HaloWarsDE Mod Manager/ModManifestMaker/bin
-HaloWarsDE Mod Manager/ModManifestMaker/obj
+HaloWarsDE Mod Manager/Mod Manifest Maker/bin
+HaloWarsDE Mod Manager/Mod Manifest Maker/obj
 
 # AutoUpdater
-HaloWarsDE Mod Manager/AutoUpdater
+HaloWarsDE Mod Manager/AutoUpdater/bin
+HaloWarsDE Mod Manager/AutoUpdater/obj
 
 # Mod Manager
 HaloWarsDE Mod Manager/HaloWarsDE Mod Manager/bin

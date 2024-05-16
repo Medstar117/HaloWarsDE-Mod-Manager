@@ -1,3 +1,7 @@
+# >>>>> ARCHIVAL NOTICE <<<<<
+Please navigate to [Firebase](https://github.com/HaloWarsModding/Firebase) for more up-to-date versions of this mod manager. This version is no longer supported.
+
+
 # HaloWarsDE Mod Manager
 A handy mod manager for Halo Wars: Definitive Edition. Supports both Steam and Microsoft Store versions.
 
